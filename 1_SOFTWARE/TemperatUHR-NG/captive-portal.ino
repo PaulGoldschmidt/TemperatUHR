@@ -5,6 +5,9 @@
  * Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
  */
 
+const char* addfooter = "<footer><p>Ein Projekt von <a href='https://paul-goldschmidt.de/TemperatUHR'>Paul Goldschmidt</a>. <p>Lizenzen und rechtliche Hinweise: <a href='https://github.com/PaulGoldschmidt/TemperatUHR'>GitHub</a>. Software Version 0.1-PRE</p></footer>";
+const char* addstyle = "<style>body { font-family: Verdana; }</style>";
+
 void InitalizeHTTPServer()
 {
   bool initok = false;
@@ -258,6 +261,7 @@ void handleRoot() {
   server.send ( 200, "text/html", temp ); // Speichersparen - Schon mal dem Cleint senden
   temp = "";
   temp += "<!DOCTYPE HTML><html lang='de'><head><meta charset='UTF-8'><meta name= viewport content='width=device-width, initial-scale=1.0,'>";
+  temp += addstyle;
   server.sendContent(temp);
   temp = "";
   temp += "<style type='text/css'><!-- DIV.container { min-height: 10em; display: table-cell; vertical-align: middle }.button {height:35px; width:90px; font-size:16px}";
@@ -321,7 +325,7 @@ void handleNotFound() {
   temp += "<a href='/'>Main Page</a><br>";
   temp += "<a href='/wifi'>WIFI Settings</a><br>";
   temp += "</th></tr></table><br><br>";
-  //temp += "<footer><p>Programmed and designed by: Tobias Kuch</p><p>Contact information: <a href='mailto:tobias.kuch@googlemail.com'>tobias.kuch@googlemail.com</a>.</p></footer>";
+  temp += addfooter;
   temp += "</body></html>";
   server.send ( 404, "", temp );
   server.client().stop(); // Stop is needed because we sent no content length
@@ -517,7 +521,7 @@ void handleWifi()
   server.sendHeader("Expires", "-1");
   server.setContentLength(CONTENT_LENGTH_UNKNOWN);
   // HTML Content
-  temp += "<style>body { font-family: Verdana; }</style>";
+  temp += addstyle;
   temp += "<!DOCTYPE HTML><html lang='de'><head><meta charset='UTF-8'><meta name= viewport content='width=device-width, initial-scale=1.0,'>";
   server.send ( 200, "text/html", temp );
   temp = "";
@@ -647,7 +651,7 @@ void handleWifi()
   server.sendContent(temp);
   temp = "";
   temp += "<a href='/'>Main Page</a><br><br></th></tr></table><br><br>";
-  //temp += "<footer><p>Programmed and designed by: Tobias Kuch</p><p>Contact Information: <a href='mailto:tobias.kuch@googlemail.com'>tobias.kuch@googlemail.com</a>.</p></footer>";
+  temp += addfooter;
   temp += "</body></html>";
   server.sendContent(temp);
   server.client().stop(); // Stop is needed because we sent no content length
