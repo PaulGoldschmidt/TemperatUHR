@@ -176,7 +176,7 @@ void loop()
   }
 
   if (internetavailable) {
-    //Serial.println("Worker process: Cloud");
+    Serial.println("Worker process: Cloud");
   }
   //  ArduinoCloud.update();
 }
