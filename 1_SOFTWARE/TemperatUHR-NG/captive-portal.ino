@@ -432,7 +432,7 @@ void handleWifi()
         Serial.println(i);
         server.client().stop();
         delay(100);
-        WiFi.setAutoReconnect (false);
+        WiFi.setAutoReconnect(false);
         delay(100);
         WiFi.disconnect();
         delay(1000);
@@ -477,13 +477,6 @@ void handleWifi()
   temp = "";
   temp += "<form action='/wifi' method='post'>";
   temp += "<table border=2 bgcolor = white width = 500><tr><th><br>";
-  if (MyWiFiConfig.APSTA == 1)
-  {
-    temp += "<input type='radio' value='1' name='WiFiMode' > WiFi Station Mode<br>";
-  } else
-  {
-    temp += "<input type='radio' value='1' name='WiFiMode' checked > WiFi Station Mode<br>";
-  }
   temp += "Available WiFi Networks:<table border=2 bgcolor = white ></tr></th><td>Number </td><td>SSID </td><td>Encryption </td><td>WiFi Strength </td>";
   server.sendContent(temp);
   temp = "";
@@ -513,69 +506,16 @@ void handleWifi()
       temp += "<option value='" + WiFi.SSID(i) + "'>" + WiFi.SSID(i) + "</option>";
     }
   } else {
-    temp += "<option value='No_WiFi_Network'>No WiFiNetwork found !/option>";
+    temp += "<option value='No_WiFi_Network'>No WiFi Network found !/option>";
   }
   server.sendContent(temp);
   temp = "";
   temp += "</select></td></tr></th></tr></th><td>WiFi Password: </td><td>";
   temp += "<input type='text' name='STAWLanPW' maxlength='40' size='40'>";
-  temp += "</td></tr></th><br></th></tr></table></table><table border=2 bgcolor = white width = 500 ><tr><th><br>";
+  temp += "</td></tr></th><br></th></tr></table></table>";
   server.sendContent(temp);
   temp = "";
-  if (MyWiFiConfig.APSTA == true)
-  {
-    temp += "<input type='radio' name='WiFiMode' value='2' checked> WiFi Access Point Mode <br>";
-  } else
-  {
-    temp += "<input type='radio' name='WiFiMode' value='2' > WiFi Access Point Mode <br>";
-  }
-  temp += "<table border=2 bgcolor = white ></tr></th> <td>WiFi Access Point Name: </td><td>";
-  server.sendContent(temp);
-  temp = "";
-  if (MyWiFiConfig.APSTA == true)
-  {
-    temp += "<input type='text' name='APPointName' maxlength='" + String(APSTANameLen - 1) + "' size='30' value='" + String(MyWiFiConfig.APSTAName) + "'></td>";
-  } else
-  {
-    temp += "<input type='text' name='APPointName' maxlength='" + String(APSTANameLen - 1) + "' size='30' ></td>";
-  }
-  server.sendContent(temp);
-  temp = "";
-  if (MyWiFiConfig.APSTA == true)
-  {
-    temp += "</tr></th><td>WiFi Password: </td><td>";
-    temp += "<input type='password' name='APPW' maxlength='" + String(WiFiPwdLen - 1) + "' size='30' value='" + String(MyWiFiConfig.WiFiPwd) + "'> </td>";
-    temp += "</tr></th><td>Repeat WiFi Password: </td>";
-    temp += "<td><input type='password' name='APPWRepeat' maxlength='" + String(WiFiPwdLen - 1) + "' size='30' value='" + String(MyWiFiConfig.WiFiPwd) + "'> </td>";
-  } else
-  {
-    temp += "</tr></th><td>WiFi Password: </td><td>";
-    temp += "<input type='password' name='APPW' maxlength='" + String(WiFiPwdLen - 1) + "' size='30'> </td>";
-    temp += "</tr></th><td>Repeat WiFi Password: </td>";
-    temp += "<td><input type='password' name='APPWRepeat' maxlength='" + String(WiFiPwdLen - 1) + "' size='30'> </td>";
-  }
-  temp += "</table>";
-  server.sendContent(temp);
-  temp = "";
-  if (MyWiFiConfig.PwDReq)
-  {
-    temp += "<input type='checkbox' name='PasswordReq' checked> Password for Login required. ";
-  } else
-  {
-    temp += "<input type='checkbox' name='PasswordReq' > Password for Login required. ";
-  }
-  server.sendContent(temp);
-  temp = "";
-  if (MyWiFiConfig.CapPortal)
-  {
-    temp += "<input type='checkbox' name='CaptivePortal' checked> Activate Captive Portal";
-  } else
-  {
-    temp += "<input type='checkbox' name='CaptivePortal' > Activate Captive Portal";
-  }
-  server.sendContent(temp);
-  temp = "";
-  temp += "<br></tr></th></table><br> <button type='submit' name='Settings' value='1' style='height: 50px; width: 140px' autofocus>Set WiFi Settings</button>";
+  temp += "<br><button type='submit' name='Settings' value='1' style='height: 50px; width: 140px' autofocus>Set WiFi Settings</button>";
   temp += "<button type='submit' name='Reboot' value='1' style='height: 50px; width: 200px' >Reboot System</button>";
   server.sendContent(temp);
   temp = "";

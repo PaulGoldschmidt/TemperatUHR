@@ -115,10 +115,12 @@ void setup()
         ConnectSuccess = true;
       } else {
         ConnectSuccess = false;
+        Serial.print("Connection success:");
+        Serial.println(ConnectSuccess);
       }
     }
-  } else
-  { //Set default Config - Create AP
+  } 
+  else { //Set default Config - Create AP
     Serial.println("DefaultWiFi Cnf");
     SetDefaultWiFiConfig ();
     CreateSoftAPSucc = CreateWifiSoftAP();
