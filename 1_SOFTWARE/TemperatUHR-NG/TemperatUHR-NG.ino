@@ -105,7 +105,16 @@ void setup()
     // Valid Credentials found.
     if (MyWiFiConfig.APSTA == true) // AP Mode
     {
-      Serial.println("STA Mode - loaded credentials.");
+      //Serial.println("AP Mode");
+      //Serial.println(MyWiFiConfig.APSTA);
+      len = strlen(MyWiFiConfig.APSTAName);
+      MyWiFiConfig.APSTAName[len + 1] = '\0';
+      len = strlen(MyWiFiConfig.WiFiPwd);
+      MyWiFiConfig.WiFiPwd[len + 1] = '\0';
+      CreateSoftAPSucc = CreateWifiSoftAP();
+    } else
+    {
+      //Serial.println("STA Mode");
       len = strlen(MyWiFiConfig.APSTAName);
       MyWiFiConfig.APSTAName[len + 1] = '\0';
       len = strlen(MyWiFiConfig.WiFiPwd);
@@ -178,7 +187,7 @@ void loop()
   }
 
   if (internetavailable) {
-    //Serial.println("Worker process: Cloud");
+    Serial.println("Worker process: Cloud");
   }
   //  ArduinoCloud.update();
 }
