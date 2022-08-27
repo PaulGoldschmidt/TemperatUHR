@@ -66,7 +66,7 @@ boolean CreateWifiSoftAP()
 
 byte ConnectWifiAP()
 {
-  // Serial.println("Initalizing Wifi Client.");
+  Serial.println("Initalizing Wifi Client.");
   byte connRes = 0;
   byte i = 0;
   WiFi.disconnect();
@@ -121,11 +121,14 @@ bool loadCredentials()
   EEPROM.begin(512);
   EEPROM.get(0, MyWiFiConfig);
   EEPROM.end();
+  Serial.print("Read WiFIConfig:");
+  Serial.println(MyWiFiConfig.ConfigValid );
   if (String(MyWiFiConfig.ConfigValid) = String("TK"))
   {
     RetValue = true;
   } else
   {
+    Serial.println("No settings in EEPRM found");
     RetValue = false; // WLAN Settings not found.
   }
   return RetValue;
@@ -163,7 +166,9 @@ bool saveCredentials()
     EEPROM.put(0, MyWiFiConfig);
     EEPROM.commit();
     EEPROM.end();
+    Serial.println(MyWiFiConfig.ConfigValid);
   }
+  Serial.println("Wrote EEPROM");
   return RetValue;
 }
 
@@ -368,7 +373,7 @@ void handleWifi()
   }
   if (server.hasArg("WiFiMode") and (server.arg("WiFiMode") == "1") ) // STA Station Mode Connect to another WIFI Station
   {
-    startMillis = millis(); // Reset Time Up Counter to avoid Idle Mode whiole operating
+    startMillis = millis(); // Reset Time Up Counter to avoid Idle Mode while operating
     // Connect to existing STATION
     if ( sizeof(server.arg("WiFi_Network")) > 0 )
     {
@@ -442,78 +447,6 @@ void handleWifi()
         return;
       }
     }
-  }
-
-  if (server.hasArg("WiFiMode") and (server.arg("WiFiMode") == "2") ) // Change AP Mode
-  {
-    startMillis = millis(); // Reset Time Up Counter to avoid Idle Mode whiole operating
-    // Configure Access Point
-    temp = server.arg("APPointName");
-    len = temp.length();
-    temp = server.arg("APPW");
-    if (server.hasArg("PasswordReq"))
-    {
-      i = temp.length();
-    } else {
-      i = 8;
-    }
-
-    if ( ( len > 1 ) and (server.arg("APPW") == server.arg("APPWRepeat")) and ( i > 7) )
-    {
-      temp = "";
-      Serial.println("APMode");
-      MyWiFiConfig.APSTA = true; // Access Point or Sation Mode - true AP Mode
-
-      if (server.hasArg("CaptivePortal"))
-      {
-        MyWiFiConfig.CapPortal = true ; //CaptivePortal on in AP Mode
-      } else {
-        MyWiFiConfig.CapPortal = false ;
-      }
-
-      if (server.hasArg("PasswordReq"))
-      {
-        MyWiFiConfig.PwDReq = true ; //Password Required in AP Mode
-      } else {
-        MyWiFiConfig.PwDReq = false ;
-      }
-
-      for ( i = 0; i < APSTANameLen; i++) {
-        MyWiFiConfig.APSTAName[i] = 0;
-      }
-      temp = server.arg("APPointName");
-      len = temp.length();
-      for ( i = 0; i < len; i++) {
-        MyWiFiConfig.APSTAName[i] = temp[i];
-      }
-      MyWiFiConfig.APSTAName[len + 1] = '\0';
-      temp = "";
-      for ( i = 0; i < WiFiPwdLen; i++) {
-        MyWiFiConfig.WiFiPwd[i] = 0;
-      }
-      temp = server.arg("APPW");
-      len = temp.length();
-      for ( i = 0; i < len; i++) {
-        MyWiFiConfig.WiFiPwd[i] = temp[i];
-      }
-      MyWiFiConfig.WiFiPwd[len + 1] = '\0';
-      temp = "";
-      if (saveCredentials()) // Save AP ConfigCongfig
-      {
-        temp = "Daten des AP Modes erfolgreich gespeichert. Reboot notwendig.";
-      } else {
-        temp = "Daten des AP Modes fehlerhaft.";
-      }
-    } else if (server.arg("APPW") != server.arg("APPWRepeat"))
-    {
-      temp = "";
-      temp = "WLAN Passwort nicht gleich. Abgebrochen.";
-    } else
-    {
-      temp = "";
-      temp = "WLAN Passwort oder AP Name zu kurz. Abgebrochen.";
-    }
-    // End WifiAP
   }
   // HTML Header
   server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
