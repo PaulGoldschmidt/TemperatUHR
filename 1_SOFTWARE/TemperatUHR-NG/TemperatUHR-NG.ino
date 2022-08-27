@@ -15,7 +15,6 @@
 #include <DallasTemperature.h>
 #include <ArduinoIoTCloud.h>
 #include <Arduino_ConnectionHandler.h>
-#include <ESP8266Ping.h>
 
 /* Hardware Configuration */
 static const short int BUILTIN_LED0 = D0; //GPIO0
@@ -164,14 +163,13 @@ void setup()
 
 void loop()
 {
-  Serial.println("Loop exec");
+  // Serial.println("Loop exec"); //For debugging stuck loops
   if (!internetavailable) {
     if (WiFi.status() == WL_CONNECTED) { //is internet available? 
       internetavailable = true;
       firstinternet = true;
     }
   }
-
   if (SoftAccOK)
   {
     dnsServer.processNextRequest(); //DNS
