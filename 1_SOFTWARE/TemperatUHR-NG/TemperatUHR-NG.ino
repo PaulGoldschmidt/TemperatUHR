@@ -1,9 +1,9 @@
 /*
- * TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
- * Software Version: 0.1-PRE
- * Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
- * Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/blob/main/2_DOCUMENTATION/acknowledgements.md
- */
+   TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
+   Software Version: 0.1-PRE
+   Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
+   Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/blob/main/2_DOCUMENTATION/acknowledgements.md
+*/
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
@@ -13,10 +13,14 @@
 #include <EEPROM.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <ArduinoIoTCloud.h>
+#include <Arduino_ConnectionHandler.h>
+#include <ESP8266Ping.h>
 
 /* Hardware Configuration */
 static const short int BUILTIN_LED0 = D0; //GPIO0
-static const short int RED_LED = D6; // Red LED Pin 
+static const short int SENSOR = D5; // Dallas DS18B20 Data Pin
+static const short int RED_LED = D6; // Red LED Pin
 static const short int GREEN_LED = D8; // Green LED Pin
 static const short int BLUE_LED = D7; // Blue LED Pin
 
@@ -65,16 +69,23 @@ unsigned long currentMillis = 0;
 unsigned long startMillis;
 const short period = 10; // Sleep after this Minutes of inactivity
 
-
 /** Current WLAN status */
 short status = WL_IDLE_STATUS;
 
 WiFiEEPromData MyWiFiConfig;
 String temp = "";
 
+/* Arduino IOT Cloud Configuration */
+const char DEVICE_LOGIN_NAME[]  = "";
+const char DEVICE_KEY[]  = "";    // Secret device password
+
+/* MISC Variables */
+bool firstinternet = false;
+bool internetavailable = false;
+const IPAddress remote_ip(8, 8, 8, 8);
+
 void setup()
 {
-
   bool ConnectSuccess = false;
   bool CreateSoftAPSucc = false;
   bool CInitFSSystem = false;
@@ -84,6 +95,9 @@ void setup()
   pinMode(RED_LED, OUTPUT); // Initialize the red pin as an output
   pinMode(GREEN_LED, OUTPUT); // Initialize the green pin as an output
   pinMode(BLUE_LED, OUTPUT); // Initialize the blue pin as an output
+  digitalWrite(RED_LED, HIGH); // Pull to HIGH: Led OFF
+  digitalWrite(GREEN_LED, HIGH); // Pull to HIGH: Led OFF
+  digitalWrite(BLUE_LED, HIGH); // Pull to HIGH: Led OFF
   Serial.begin(115200);
   Serial.println("TemperatUHR Starting...");
   WiFi.hostname(ESPHostname); // Set the DHCP hostname assigned to ESP station.
@@ -150,6 +164,14 @@ void setup()
 
 void loop()
 {
+  Serial.println("Loop exec");
+  if (!internetavailable) {
+    if (WiFi.status() == WL_CONNECTED) { //is internet available? 
+      internetavailable = true;
+      firstinternet = true;
+    }
+  }
+
   if (SoftAccOK)
   {
     dnsServer.processNextRequest(); //DNS
@@ -157,4 +179,15 @@ void loop()
   //HTTP
   server.handleClient();
   yield();
+
+  if (firstinternet) {
+    Serial.println("Internet first connected, setting up connections");
+    initProperties();
+    firstinternet = false;
+  }
+
+  if (internetavailable) {
+    Serial.println("Worker process: Cloud");
+  }
+  //  ArduinoCloud.update();
 }
