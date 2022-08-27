@@ -11,7 +11,20 @@
 #include <ESP8266mDNS.h>
 #include <DNSServer.h>
 #include <EEPROM.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
+/* Hardware Configuration */
+static const short int BUILTIN_LED0 = D0; //GPIO0
+static const short int RED_LED = D6; // Red LED Pin 
+static const short int GREEN_LED = D8; // Green LED Pin
+static const short int BLUE_LED = D7; // Blue LED Pin
+
+#define ONE_WIRE_BUS 14 //the sensor is connected to pin #14
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+/* WIFI Configuration */
 static const byte WiFiPwdLen = 25;
 static const byte APSTANameLen = 20;
 
@@ -25,7 +38,6 @@ struct WiFiEEPromData
   char ConfigValid[3]; //If Config is Vaild, Tag "TK" is required"
 };
 
-static const short int BUILTIN_LED0 = D0; //GPIO0
 /* hostname for mDNS. Should work at least on windows. Try http://esp8266.local */
 const char *ESPHostname = "ESP";
 
@@ -68,8 +80,11 @@ void setup()
   bool CInitFSSystem = false;
   bool CInitHTTPServer = false;
   byte len;
-  pinMode(D0, OUTPUT); // Initialize the BUILTIN_LED1 pin as an output
-  Serial.begin(9600);
+  pinMode(BUILTIN_LED0, OUTPUT); // Initialize the BUILTIN_LED1 pin as an output
+  pinMode(RED_LED, OUTPUT); // Initialize the red pin as an output
+  pinMode(GREEN_LED, OUTPUT); // Initialize the green pin as an output
+  pinMode(BLUE_LED, OUTPUT); // Initialize the blue pin as an output
+  Serial.begin(115200);
   Serial.println("TemperatUHR Starting...");
   WiFi.hostname(ESPHostname); // Set the DHCP hostname assigned to ESP station.
   if (loadCredentials()) // Load WLAN credentials for WiFi Settings
