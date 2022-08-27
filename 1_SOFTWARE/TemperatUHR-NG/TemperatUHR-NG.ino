@@ -4,13 +4,16 @@
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
 #include <EEPROM.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <BlynkSimpleEsp8266.h>
 
 /*
- * TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
- * Software Version: 0.1-PRE
- * Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
- * Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
- */
+   TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
+   Software Version: 0.1-PRE
+   Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
+   Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
+*/
 
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
 
@@ -45,33 +48,34 @@ unsigned long lastConnectTry = 0;
 /** Current WLAN status */
 unsigned int status = WL_IDLE_STATUS;
 
+/* Hardware Configuration */
+static const short int BUILTIN_LED0 = D0; //GPIO0
+static const short int SENSOR = D5; // Dallas DS18B20 Data Pin
+static const short int RED_LED = D6; // Red LED Pin
+static const short int GREEN_LED = D8; // Green LED Pin
+static const short int BLUE_LED = D7; // Blue LED Pin
+
+#define ONE_WIRE_BUS 14 //the sensor is connected to pin #14
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+/* Blynk Configuration */
+#define BLYNK_PRINT Serial //if needed: Debug console
+WidgetLED led1(V2); //an virtual LED is in the app "connected" to V2.
+
+bool internetavailable = false;
+bool firstinternet = false;
+
 void setup() {
-  delay(1000);
+  pinMode(BUILTIN_LED0, OUTPUT); // Initialize the BUILTIN_LED1 pin as an output
+  pinMode(RED_LED, OUTPUT); // Initialize the red pin as an output
+  pinMode(GREEN_LED, OUTPUT); // Initialize the green pin as an output
+  pinMode(BLUE_LED, OUTPUT); // Initialize the blue pin as an output
+  digitalWrite(RED_LED, HIGH); // Pull to HIGH: Led OFF
+  digitalWrite(GREEN_LED, HIGH); // Pull to HIGH: Led OFF
+  digitalWrite(BLUE_LED, HIGH); // Pull to HIGH: Led OFF
   Serial.begin(115200);
-  Serial.println();
-  Serial.println("Configuring access point...");
-  /* You can remove the password parameter if you want the AP to be open. */
-  WiFi.softAPConfig(apIP, apIP, netMsk);
-  WiFi.softAP(softAP_ssid);
-  delay(500); // Without delay I've seen the IP address blank
-  Serial.print("AP IP address: ");
-  Serial.println(WiFi.softAPIP());
-
-  /* Setup the DNS server redirecting all the domains to the apIP */
-  dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
-  dnsServer.start(DNS_PORT, "*", apIP);
-
-  /* Setup web pages: root, wifi config pages, SO captive portal detectors and not found. */
-  server.on("/", handleRoot);
-  server.on("/wifi", handleWifi);
-  server.on("/wifisave", handleWifiSave);
-  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.onNotFound(handleNotFound);
-  server.begin(); // Web server start
-  Serial.println("HTTP server started");
-  loadCredentials(); // Load WLAN credentials from network
-  connect = strlen(ssid) > 0; // Request WLAN connect if there is a SSID
+  initCaptive();
 }
 
 void connectWifi() {
@@ -84,50 +88,67 @@ void connectWifi() {
 }
 
 void loop() {
-  if (connect) {
-    Serial.println("Connect requested");
-    connect = false;
-    connectWifi();
-    lastConnectTry = millis();
-  }
-  {
-    unsigned int s = WiFi.status();
-    if (s == 0 && millis() > (lastConnectTry + 60000)) {
-      /* If WLAN disconnected and idle try to connect */
-      /* Don't set retry time too low as retry interfere the softAP operation */
-      connect = true;
+  if (!internetavailable) {
+    if (WiFi.status() == WL_CONNECTED) { //is internet available?
+      internetavailable = true;
+      firstinternet = true;
     }
-    if (status != s) { // WLAN status change
-      Serial.print("Status: ");
-      Serial.println(s);
-      status = s;
-      if (s == WL_CONNECTED) {
-        /* Just connected to WLAN */
-        Serial.println("");
-        Serial.print("Connected to ");
-        Serial.println(ssid);
-        Serial.print("IP address: ");
-        Serial.println(WiFi.localIP());
+    if (connect) {
+      Serial.println("Connect requested");
+      connect = false;
+      connectWifi();
+      lastConnectTry = millis();
+    }
+    {
+      unsigned int s = WiFi.status();
+      if (s == 0 && millis() > (lastConnectTry + 60000)) {
+        /* If WLAN disconnected and idle try to connect */
+        /* Don't set retry time too low as retry interfere the softAP operation */
+        connect = true;
+      }
+      if (status != s) { // WLAN status change
+        Serial.print("Status: ");
+        Serial.println(s);
+        status = s;
+        if (s == WL_CONNECTED) {
+          /* Just connected to WLAN */
+          Serial.println("");
+          Serial.print("Connected to ");
+          Serial.println(ssid);
+          Serial.print("IP address: ");
+          Serial.println(WiFi.localIP());
 
-        // Setup MDNS responder
-        if (!MDNS.begin(myHostname)) {
-          Serial.println("Error setting up MDNS responder!");
-        } else {
-          Serial.println("mDNS responder started");
-          // Add service to MDNS-SD
-          MDNS.addService("http", "tcp", 80);
+          // Setup MDNS responder
+          if (!MDNS.begin(myHostname)) {
+            Serial.println("Error setting up MDNS responder!");
+          } else {
+            Serial.println("mDNS responder started");
+            // Add service to MDNS-SD
+            MDNS.addService("http", "tcp", 80);
+          }
+        } else if (s == WL_NO_SSID_AVAIL) {
+          WiFi.disconnect();
         }
-      } else if (s == WL_NO_SSID_AVAIL) {
-        WiFi.disconnect();
+      }
+      if (s == WL_CONNECTED) {
+        MDNS.update();
       }
     }
-    if (s == WL_CONNECTED) {
-      MDNS.update();
+    // Do work:
+    //DNS
+    dnsServer.processNextRequest();
+    //HTTP
+    server.handleClient();
+
+    if (firstinternet) {
+      Serial.println("Internet first connected, setting up connections");
+      Blynk.config(token);
+      firstinternet = false;
+    }
+
+    if (internetavailable) {
+      Blynk.run();
+      Serial.println("Worker process: Cloud");
     }
   }
-  // Do work:
-  //DNS
-  dnsServer.processNextRequest();
-  //HTTP
-  server.handleClient();
 }

@@ -30,6 +30,32 @@ void saveCredentials() {
   EEPROM.end();
 }
 
+void initCaptive() {
+  Serial.println();
+  Serial.println("Configuring access point...");
+  /* You can remove the password parameter if you want the AP to be open. */
+  WiFi.softAPConfig(apIP, apIP, netMsk);
+  WiFi.softAP(softAP_ssid);
+  delay(500); // Without delay I've seen the IP address blank
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.softAPIP());
+
+  /* Setup the DNS server redirecting all the domains to the apIP */
+  dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
+  dnsServer.start(DNS_PORT, "*", apIP);
+
+  /* Setup web pages: root, wifi config pages, SO captive portal detectors and not found. */
+  server.on("/", handleRoot);
+  server.on("/wifi", handleWifi);
+  server.on("/wifisave", handleWifiSave);
+  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.onNotFound(handleNotFound);
+  server.begin(); // Web server start
+  Serial.println("HTTP server started");
+  loadCredentials(); // Load WLAN credentials from network
+  connect = strlen(ssid) > 0; // Request WLAN connect if there is a SSID
+}
 
 /** Handle root or redirect to captive portal */
 void handleRoot() {
@@ -168,25 +194,4 @@ void handleNotFound() {
   server.sendHeader("Pragma", "no-cache");
   server.sendHeader("Expires", "-1");
   server.send(404, "text/plain", message);
-}
-
-/** Is this an IP? */
-boolean isIp(String str) {
-  for (size_t i = 0; i < str.length(); i++) {
-    int c = str.charAt(i);
-    if (c != '.' && (c < '0' || c > '9')) {
-      return false;
-    }
-  }
-  return true;
-}
-
-/** IP to String? */
-String toStringIp(IPAddress ip) {
-  String res = "";
-  for (int i = 0; i < 3; i++) {
-    res += String((ip >> (8 * i)) & 0xFF) + ".";
-  }
-  res += String(((ip >> 8 * 3)) & 0xFF);
-  return res;
 }
