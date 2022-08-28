@@ -64,10 +64,12 @@ float temperature;
 #define BLYNK_PRINT Serial //if needed: Debug console
 WidgetLED led1(V2); //an virtual LED is in the app "connected" to V2.
 
-unsigned int distanceToSensor;
-int targetTemperature;
+unsigned int distancetosensor;
+int targettemperature;
 bool internetavailable = false;
 bool firstinternet = false;
+bool temperatuhrstandby = false;
+bool cooldownmode = false;
 
 void setup() {
   delay(100);
