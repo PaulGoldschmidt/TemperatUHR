@@ -1,3 +1,10 @@
+/*
+   TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
+   Software Version: 0.1-PRE
+   Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
+   Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
+*/
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
@@ -7,13 +14,6 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <BlynkSimpleEsp8266.h>
-
-/*
-   TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
-   Software Version: 0.1-PRE
-   Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
-   Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
-*/
 
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
 

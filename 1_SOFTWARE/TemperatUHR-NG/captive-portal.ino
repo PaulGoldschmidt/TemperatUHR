@@ -1,3 +1,10 @@
+/*
+   TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
+   Software Version: 0.1-PRE
+   Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
+   Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
+*/
+
 /** Load WLAN credentials from EEPROM */
 void loadCredentials() {
   EEPROM.begin(512);
