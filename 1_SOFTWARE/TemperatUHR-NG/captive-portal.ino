@@ -3,18 +3,18 @@ void loadCredentials() {
   EEPROM.begin(512);
   EEPROM.get(0, ssid);
   EEPROM.get(0 + sizeof(ssid), password);
-  EEPROM.get(0 + sizeof(ssid) + sizeof(password), token);
+  EEPROM.get(0 + sizeof(ssid) + sizeof(password), auth);
   char ok[2 + 1];
-  EEPROM.get(0 + sizeof(ssid) + sizeof(password) + sizeof(token), ok);
+  EEPROM.get(0 + sizeof(ssid) + sizeof(password) + sizeof(auth), ok);
   EEPROM.end();
   if (String(ok) != String("OK")) {
     ssid[0] = 0;
     password[0] = 0;
-    token[0] = 0;
+    auth[0] = 0;
   }
   Serial.println("Recovered credentials:");
   Serial.println(ssid);
-  Serial.println(strlen(token) > 10 ? "********" : "<no token>");
+  Serial.println(strlen(auth) > 10 ? "********" : "<no auth>");
   Serial.println(strlen(password) > 0 ? "********" : "<no password>");
 }
 
@@ -23,9 +23,9 @@ void saveCredentials() {
   EEPROM.begin(512);
   EEPROM.put(0, ssid);
   EEPROM.put(0 + sizeof(ssid), password);
-  EEPROM.put(0 + sizeof(ssid) + sizeof(password), token);
+  EEPROM.put(0 + sizeof(ssid) + sizeof(password), auth);
   char ok[2 + 1] = "OK";
-  EEPROM.put(0 + sizeof(ssid) + sizeof(password) + sizeof(token), ok);
+  EEPROM.put(0 + sizeof(ssid) + sizeof(password) + sizeof(auth), ok);
   EEPROM.commit();
   EEPROM.end();
 }
@@ -150,7 +150,7 @@ void handleWifi() {
             "\r\n<br /><form method='POST' action='wifisave'><h4>Connect to network:</h4>"
             "<input type='text' placeholder='Network' name='n'/>"
             "<br /><input type='password' placeholder='Password' name='p'/>"
-            "<br /><input type='password' placeholder='Blynk Auth Token' name='b'/>"
+            "<br /><input type='password' placeholder='Blynk Auth auth' name='b'/>"
             "<br /><input type='submit' value='Connect/Disconnect'/></form>"
             "<p>You may want to <a href='/'>return to the home page</a>.</p>"
             "</body></html>");
@@ -163,7 +163,7 @@ void handleWifiSave() {
   Serial.println("wifi save");
   server.arg("n").toCharArray(ssid, sizeof(ssid) - 1);
   server.arg("p").toCharArray(password, sizeof(password) - 1);
-  server.arg("b").toCharArray(token, sizeof(token) - 1);
+  server.arg("b").toCharArray(auth, sizeof(auth) - 1);
   server.sendHeader("Location", "wifi", true);
   server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   server.sendHeader("Pragma", "no-cache");

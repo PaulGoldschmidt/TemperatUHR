@@ -25,7 +25,7 @@ const char *myHostname = "temperatUHR";
 /* Don't set this wifi credentials. They are configurated at runtime and stored on EEPROM */
 char ssid[33] = "";
 char password[65] = "";
-char token[110] = "";
+char auth[110] = "";
 
 // DNS server
 const byte DNS_PORT = 53;
@@ -63,8 +63,6 @@ DallasTemperature sensors(&oneWire);
 #define BLYNK_PRINT Serial //if needed: Debug console
 WidgetLED led1(V2); //an virtual LED is in the app "connected" to V2.
 
-#define BLYNK_TEMPLATE_ID "TMPLbHn67VSh"
-#define BLYNK_DEVICE_NAME "TemperatUHR"
 
 bool internetavailable = false;
 bool firstinternet = false;
@@ -146,20 +144,19 @@ void loop() {
   server.handleClient();
 
   if (firstinternet) {
-    Serial.print("Internet first connected, setting up connections. Connection status to Blynk:");
+    Serial.print("Internet first connected, setting up connections. Connection status to Blynk: ");
     delay(500);
+    Blynk.config(auth, "blynk.cloud", 80);
     Serial.println(Blynk.connect());
     WiFi.printDiag(Serial);
-    Blynk.config(token);
     firstinternet = false;
   }
 
   if (internetavailable) {
     Serial.println("Worker process: Cloud");
     runsensor();
-    if (strlen(token) > 10) {
+    if (strlen(auth) > 10) {
       Blynk.run();
-      Serial.println("Blynk!");
     } 
   }
   delay(500);

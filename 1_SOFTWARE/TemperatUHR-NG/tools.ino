@@ -1,9 +1,9 @@
 void runsensor() {
   sensors.requestTemperatures(); //request temp sensor data
   float temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
-  Serial.print("Temperatur:");
+  Serial.print("Temperature:");
   Serial.println(temperature);
-  Blynk.virtualWrite(V2, temperature);
+  Blynk.virtualWrite(V0, temperature);
 }
 
 /** Is this an IP? */
