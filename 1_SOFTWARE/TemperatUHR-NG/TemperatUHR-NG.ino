@@ -49,7 +49,7 @@ unsigned long lastConnectTry = 0;
 unsigned int status = WL_IDLE_STATUS;
 
 /* Hardware Configuration */
-static const short int BUILTIN_LED0 = D0; //GPIO0
+static const short int BUILTIN_LED0 = D0; //GPIO0: Build-In LED
 static const short int SENSOR = D5; // Dallas DS18B20 Data Pin
 static const short int RED_LED = D6; // Red LED Pin
 static const short int GREEN_LED = D8; // Green LED Pin
@@ -58,6 +58,7 @@ static const short int BLUE_LED = D7; // Blue LED Pin
 #define ONE_WIRE_BUS 14 //the sensor is connected to pin #14
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
+float temperature;
 
 /* Blynk Configuration */
 #define BLYNK_PRINT Serial //if needed: Debug console
@@ -76,6 +77,8 @@ void setup() {
   digitalWrite(GREEN_LED, HIGH); // Pull to HIGH: Led OFF
   digitalWrite(BLUE_LED, HIGH); // Pull to HIGH: Led OFF
   Serial.begin(115200);
+  Serial.println("Hallo, world! TemperatUHR starting...");
+  runsensor(); //get temp & check sensor
   initCaptive();
 }
 
@@ -136,7 +139,7 @@ void loop() {
       MDNS.update();
     }
   }
-  
+
   // Do work:
   //DNS
   dnsServer.processNextRequest();
@@ -148,16 +151,19 @@ void loop() {
     delay(500);
     Blynk.config(auth, "blynk.cloud", 80);
     Serial.println(Blynk.connect());
-    WiFi.printDiag(Serial);
     firstinternet = false;
   }
 
   if (internetavailable) {
     Serial.println("Worker process: Cloud");
     runsensor();
+    Blynk.virtualWrite(V0, temperature);
     if (strlen(auth) > 10) {
+      digitalWrite(GREEN_LED, LOW);
       Blynk.run();
-    } 
+      delay(250);
+      digitalWrite(GREEN_LED, HIGH);
+    }
   }
   delay(500);
 }

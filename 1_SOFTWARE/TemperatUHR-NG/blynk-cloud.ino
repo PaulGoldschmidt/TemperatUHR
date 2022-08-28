@@ -7,8 +7,15 @@
 
 void runsensor() {
   sensors.requestTemperatures(); //request temp sensor data
-  float temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
+  temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
   Serial.print("Temperature:");
   Serial.println(temperature);
-  Blynk.virtualWrite(V0, temperature);
+  if (temperature == -127) {
+    while (true) {
+      digitalWrite(RED_LED, LOW);
+      delay(250);
+      digitalWrite(RED_LED, HIGH);
+      delay(250);
+    }
+  }
 }
