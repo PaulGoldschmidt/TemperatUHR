@@ -1,6 +1,6 @@
 /*
    TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
-   Software Version: 0.1-PRE
+   Software Version: 0.2-PRE
    Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
    Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
 */
@@ -69,17 +69,21 @@ bool internetavailable = false;
 bool firstinternet = false;
 
 void setup() {
+  delay(100);
+  Serial.begin(115200);
+  Serial.println("Hallo, world! TemperatUHR starting...");
   pinMode(BUILTIN_LED0, OUTPUT); // Initialize the BUILTIN_LED1 pin as an output
   pinMode(RED_LED, OUTPUT); // Initialize the red pin as an output
   pinMode(GREEN_LED, OUTPUT); // Initialize the green pin as an output
   pinMode(BLUE_LED, OUTPUT); // Initialize the blue pin as an output
+  digitalWrite(RED_LED, LOW); // Pull to LOW: Led ON
+  digitalWrite(GREEN_LED, LOW); // Pull to LOW: Led ON
+  digitalWrite(BLUE_LED, LOW); // Pull to LOW: Led ON
+  runsensor(); //get temp & check sensor
+  initCaptive();
   digitalWrite(RED_LED, HIGH); // Pull to HIGH: Led OFF
   digitalWrite(GREEN_LED, HIGH); // Pull to HIGH: Led OFF
   digitalWrite(BLUE_LED, HIGH); // Pull to HIGH: Led OFF
-  Serial.begin(115200);
-  Serial.println("Hallo, world! TemperatUHR starting...");
-  runsensor(); //get temp & check sensor
-  initCaptive();
 }
 
 void connectWifi() {
@@ -93,6 +97,7 @@ void connectWifi() {
 
 void loop() {
   if (!internetavailable) {
+    digitalWrite(BLUE_LED, LOW); // Pull to LOW: Led ON
     if (WiFi.status() == WL_CONNECTED) { //is internet available?
       internetavailable = true;
       firstinternet = true;

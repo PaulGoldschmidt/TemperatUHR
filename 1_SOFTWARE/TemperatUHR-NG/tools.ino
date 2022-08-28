@@ -1,6 +1,6 @@
 /*
    TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
-   Software Version: 0.1-PRE
+   Software Version: 0.2-PRE
    Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
    Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
 */
