@@ -34,19 +34,20 @@ void calctime() {
   int timetosensor = distancetosensor / walkspeed;
   int timetillnotification = timetilltarget - timetosensor;
   if ((timetillnotification <= 0) && (temperatuhrstandby == false)) {
-    Blynk.notify("Quick! Soon TemperatUHR will reach the target temperature.");
+    Blynk.notify("Quick! Soon TemperatUHR will reach the target temperature."); //TODO: Check Notifications
     Serial.println("Notification send.");
     temperatuhrstandby = true; // set temperatuhr into standby, so that there won't be a second notification
   }
+  
   if (tempdifference() <= 0) {
-    Blynk.virtualWrite(V3, 1);
+    Blynk.virtualWrite(V3, 1); //Turn LED on in App
   }
   else {
     Blynk.virtualWrite(V3, 0);
     }
 }
 
-void temperatuhrstandbycheck() {
+void temperatuhrstandbycheck() { //avoiding hysterisis and notifying the user about the current status.
   if (tempdifference() > 5) {
     temperatuhrstandby = false;
     digitalWrite(BLUE_LED, HIGH);
@@ -59,7 +60,7 @@ void temperatuhrstandbycheck() {
   }
 }
 
-int tempdifference() {
+int tempdifference() { // calculate the temperature between the current temperature and the goal temperature.
   int tempdifferencecalc;
   if (cooldownmode == false) { 
     tempdifferencecalc = targettemperature - temperature;
