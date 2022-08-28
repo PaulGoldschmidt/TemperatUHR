@@ -8,7 +8,7 @@
 void runsensor() {
   sensors.requestTemperatures(); //request temp sensor data
   temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
-  Serial.print("Temperature:");
+  Serial.print("Temperature: ");
   Serial.println(temperature);
   while (temperature == -127) {
     sensors.requestTemperatures(); //request temp sensor data
@@ -18,23 +18,28 @@ void runsensor() {
     digitalWrite(RED_LED, HIGH);
     delay(250);
   }
+  temperatuhrstandbycheck();
 }
 
 void calctime() {
   float walkspeed = 1; //walking speed in m/s; 1 m/s standart, change if necessary
   sensors.requestTemperatures(); //request temp sensor data
   int oldtemperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
-  delay(2500); //wait for 2.5 Seconds
+  delay(1500); //wait for 1.5 Seconds
   sensors.requestTemperatures(); //request temp sensor data
   temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
-  float degreespersec = (temperature - oldtemperature) / 2.5;
+  float degreespersec = (temperature - oldtemperature) / 1.5;
   int timetilltarget = tempdifference() / degreespersec;
   Blynk.virtualWrite(V2, timetilltarget);
   int timetosensor = distancetosensor / walkspeed;
   int timetillnotification = timetilltarget - timetosensor;
-  if (timetillnotification <= 0) {
+  if ((timetillnotification <= 0) && (temperatuhrstandby == false)) {
     Blynk.notify("Quick! Soon TemperatUHR will reach the target temperature.");
+    Serial.println("Notification send.");
     temperatuhrstandby = true; // set temperatuhr into standby, so that there won't be a second notification
+  }
+  if (tempdifference() <= 0) {
+    Blynk.virtualWrite(V3, 1);
   }
   else {
     Blynk.virtualWrite(V3, 0);
@@ -45,12 +50,12 @@ void temperatuhrstandbycheck() {
   if (tempdifference() > 5) {
     temperatuhrstandby = false;
     digitalWrite(BLUE_LED, HIGH);
-    analogWrite(RED_LED, 155);
+    analogWrite(RED_LED, 10);
   }
 
   if (temperatuhrstandby == true) {
     digitalWrite(RED_LED, HIGH);
-    analogWrite(BLUE_LED, 155);
+    analogWrite(BLUE_LED, 10);
   }
 }
 
@@ -77,8 +82,10 @@ BLYNK_WRITE(V1)
   Serial.println("New target temperature: " + String(targettemperature) + " Degrees.");
   if (temperature <= targettemperature) { // target temperature higher than current temperature
     cooldownmode = false;
+    Serial.println("No cooldown mode!");
   }
   else {
     cooldownmode = true;
+    Serial.println("Cooldown mode!");
   }
 }
