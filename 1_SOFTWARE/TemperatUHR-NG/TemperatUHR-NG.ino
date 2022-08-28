@@ -152,6 +152,7 @@ void loop() {
   server.handleClient();
 
   if (firstinternet) {
+    digitalWrite(BLUE_LED, HIGH); //Now with internet, we can turn off the blue LED
     Serial.print("Internet first connected, setting up connections. Connection status to Blynk: ");
     delay(500);
     Blynk.config(auth, "blynk.cloud", 80);
