@@ -10,12 +10,12 @@ void runsensor() {
   temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
   Serial.print("Temperature:");
   Serial.println(temperature);
-  if (temperature == -127) {
-    while (true) {
-      digitalWrite(RED_LED, LOW);
-      delay(250);
-      digitalWrite(RED_LED, HIGH);
-      delay(250);
-    }
+  while (temperature == -127) {
+    sensors.requestTemperatures(); //request temp sensor data
+    temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
+    digitalWrite(RED_LED, LOW);
+    delay(250);
+    digitalWrite(RED_LED, HIGH);
+    delay(250);
   }
 }
