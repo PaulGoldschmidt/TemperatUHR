@@ -64,7 +64,8 @@ float temperature;
 #define BLYNK_PRINT Serial //if needed: Debug console
 WidgetLED led1(V2); //an virtual LED is in the app "connected" to V2.
 
-
+unsigned int distanceToSensor;
+int targetTemperature;
 bool internetavailable = false;
 bool firstinternet = false;
 
@@ -164,6 +165,7 @@ void loop() {
     Serial.println("Worker process: Cloud");
     runsensor();
     Blynk.virtualWrite(V0, temperature);
+    calctime(); 
     if (strlen(auth) > 10) {
       digitalWrite(GREEN_LED, LOW);
       Blynk.run();

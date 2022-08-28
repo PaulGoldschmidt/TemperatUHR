@@ -19,3 +19,31 @@ void runsensor() {
     delay(250);
   }
 }
+
+void calctime() {
+  int tempdifference;
+  sensors.requestTemperatures(); //request temp sensor data
+  int oldtemperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
+  delay(2500); //wait for 2.5 Seconds
+  sensors.requestTemperatures(); //request temp sensor data
+  int newtemperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
+  float degreespersec = (newtemperature - oldtemperature) / 2.5;
+  if (newtemperature <= targetTemperature) { // target temperature higher than current temperature
+    tempdifference = targetTemperature - newtemperature;
+  }
+  else {
+    tempdifference = newtemperature - targetTemperature;
+  }
+  int timetilltarget = tempdifference / degreespersec;
+  Blynk.virtualWrite(V2, timetilltarget);
+}
+
+BLYNK_WRITE(V4)
+{
+  distanceToSensor = param.asInt(); // assigning incoming value from pin V1 to a variable
+}
+
+BLYNK_WRITE(V1)
+{
+  targetTemperature = param.asInt(); // assigning incoming value from pin V1 to a variable
+}
