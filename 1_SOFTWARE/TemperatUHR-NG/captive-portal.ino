@@ -77,15 +77,26 @@ void handleRoot() {
   Page += F(
             "<!DOCTYPE html><html lang='en'><head>"
             "<meta name='viewport' content='width=device-width'>"
-            "<title>CaptivePortal</title></head><body>"
-            "<h1>HELLO WORLD!!</h1>");
+            "<title>TemperatUHR Configuration</title>"
+            "<style>"
+            "p {"
+            "text-align: center;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            " h1 {"
+            "text-align: center;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            "</style>"
+            "</head><body>"
+            "<h1>TemperatUHR Configuration Webapp</h1>");
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
   } else {
     Page += String(F("<p>You are connected through the wifi network: ")) + ssid + F("</p>");
   }
   Page += F(
-            "<p>You may want to <a href='/wifi'>config the wifi connection</a>.</p>"
+            "<p>You may want to <a href='/wifi'>config the wifi connection and add an Blynk Token.</a>.</p>"
             "</body></html>");
 
   server.send(200, "text/html", Page);
