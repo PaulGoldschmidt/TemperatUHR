@@ -63,6 +63,9 @@ DallasTemperature sensors(&oneWire);
 #define BLYNK_PRINT Serial //if needed: Debug console
 WidgetLED led1(V2); //an virtual LED is in the app "connected" to V2.
 
+#define BLYNK_TEMPLATE_ID "TMPLbHn67VSh"
+#define BLYNK_DEVICE_NAME "TemperatUHR"
+
 bool internetavailable = false;
 bool firstinternet = false;
 
@@ -93,62 +96,71 @@ void loop() {
       internetavailable = true;
       firstinternet = true;
     }
-    if (connect) {
-      Serial.println("Connect requested");
-      connect = false;
-      connectWifi();
-      lastConnectTry = millis();
+  }
+  if (connect) {
+    Serial.println("Connect requested");
+    connect = false;
+    connectWifi();
+    lastConnectTry = millis();
+  }
+  {
+    unsigned int s = WiFi.status();
+    if (s == 0 && millis() > (lastConnectTry + 60000)) {
+      /* If WLAN disconnected and idle try to connect */
+      /* Don't set retry time too low as retry interfere the softAP operation */
+      connect = true;
     }
-    {
-      unsigned int s = WiFi.status();
-      if (s == 0 && millis() > (lastConnectTry + 60000)) {
-        /* If WLAN disconnected and idle try to connect */
-        /* Don't set retry time too low as retry interfere the softAP operation */
-        connect = true;
-      }
-      if (status != s) { // WLAN status change
-        Serial.print("Status: ");
-        Serial.println(s);
-        status = s;
-        if (s == WL_CONNECTED) {
-          /* Just connected to WLAN */
-          Serial.println("");
-          Serial.print("Connected to ");
-          Serial.println(ssid);
-          Serial.print("IP address: ");
-          Serial.println(WiFi.localIP());
-
-          // Setup MDNS responder
-          if (!MDNS.begin(myHostname)) {
-            Serial.println("Error setting up MDNS responder!");
-          } else {
-            Serial.println("mDNS responder started");
-            // Add service to MDNS-SD
-            MDNS.addService("http", "tcp", 80);
-          }
-        } else if (s == WL_NO_SSID_AVAIL) {
-          WiFi.disconnect();
-        }
-      }
+    if (status != s) { // WLAN status change
+      Serial.print("Status: ");
+      Serial.println(s);
+      status = s;
       if (s == WL_CONNECTED) {
-        MDNS.update();
+        /* Just connected to WLAN */
+        Serial.println("");
+        Serial.print("Connected to ");
+        Serial.println(ssid);
+        Serial.print("IP address: ");
+        Serial.println(WiFi.localIP());
+
+        // Setup MDNS responder
+        if (!MDNS.begin(myHostname)) {
+          Serial.println("Error setting up MDNS responder!");
+        } else {
+          Serial.println("mDNS responder started");
+          // Add service to MDNS-SD
+          MDNS.addService("http", "tcp", 80);
+        }
+      } else if (s == WL_NO_SSID_AVAIL) {
+        WiFi.disconnect();
       }
     }
-    // Do work:
-    //DNS
-    dnsServer.processNextRequest();
-    //HTTP
-    server.handleClient();
-
-    if (firstinternet) {
-      Serial.println("Internet first connected, setting up connections");
-      Blynk.config(token);
-      firstinternet = false;
-    }
-
-    if (internetavailable) {
-      Blynk.run();
-      Serial.println("Worker process: Cloud");
+    if (s == WL_CONNECTED) {
+      MDNS.update();
     }
   }
+  
+  // Do work:
+  //DNS
+  dnsServer.processNextRequest();
+  //HTTP
+  server.handleClient();
+
+  if (firstinternet) {
+    Serial.print("Internet first connected, setting up connections. Connection status to Blynk:");
+    delay(500);
+    Serial.println(Blynk.connect());
+    WiFi.printDiag(Serial);
+    Blynk.config(token);
+    firstinternet = false;
+  }
+
+  if (internetavailable) {
+    Serial.println("Worker process: Cloud");
+    runsensor();
+    if (strlen(token) > 10) {
+      Blynk.run();
+      Serial.println("Blynk!");
+    } 
+  }
+  delay(500);
 }

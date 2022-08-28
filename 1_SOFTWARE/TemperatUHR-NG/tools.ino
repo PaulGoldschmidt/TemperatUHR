@@ -1,3 +1,11 @@
+void runsensor() {
+  sensors.requestTemperatures(); //request temp sensor data
+  float temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
+  Serial.print("Temperatur:");
+  Serial.println(temperature);
+  Blynk.virtualWrite(V2, temperature);
+}
+
 /** Is this an IP? */
 boolean isIp(String str) {
   for (size_t i = 0; i < str.length(); i++) {

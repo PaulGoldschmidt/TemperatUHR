@@ -14,7 +14,7 @@ void loadCredentials() {
   }
   Serial.println("Recovered credentials:");
   Serial.println(ssid);
-  Serial.println(strlen(token) > 0 ? "********" : "<no token>");
+  Serial.println(strlen(token) > 10 ? "********" : "<no token>");
   Serial.println(strlen(password) > 0 ? "********" : "<no password>");
 }
 
