@@ -174,7 +174,7 @@ void handleWifi() {
   Page +=
     String(F(
              "\r\n<br />"
-             "<table><tr><th>SoftAP Information</th></tr>"
+             "<table><tr><th>TemperatUHR Hotspot Information</th></tr>"
              "<tr><td>SSID ")) +
     String(softAP_ssid) +
     F("</td></tr>"
@@ -192,13 +192,13 @@ void handleWifi() {
     F("</td></tr>"
       "</table>"
       "\r\n<br />"
-      "<table><tr><th>WLAN list (SSID / Encryption Type / Signal Strengh)</th></tr>");
+      "<table><tr><th>WLAN list (SSID / Password Required / Signal Strengh)</th></tr>");
   Serial.println("scan start");
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
   if (n > 0) {
     for (int i = 0; i < n; i++) {
-      Page += String(F("\r\n<tr><td>")) + WiFi.SSID(i) + F(" / ") + ((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? F(" -") : F(" *")) + + F(" / ") + WiFi.RSSI(i) +  F("dBm</td></tr>");
+      Page += String(F("\r\n<tr><td>")) + WiFi.SSID(i) + F(" / ") + ((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? F(" No") : F(" Yes")) + + F(" / ") + WiFi.RSSI(i) +  F("dBm</td></tr>");
     }
   } else {
     Page += F("<tr><td>No WLAN found</td></tr>");
