@@ -158,15 +158,14 @@ void loop() {
 
   if (firstinternet) {
     digitalWrite(BLUE_LED, HIGH); //Now with internet, we can turn off the blue LED
-    Serial.print("Internet first connected, setting up connections. Connection status to Blynk: ");
+    Serial.println("Internet first connected, setting up connections.");
     delay(500);
     Blynk.config(auth, "blynk.cloud", 80);
-    Serial.println(Blynk.connect());
     firstinternet = false;
   }
 
   if (internetavailable) {
-    Serial.println("Worker process: Cloud");
+    Serial.println("\nWorker process: Cloud");
     runsensor();
     Blynk.virtualWrite(V0, temperature);
     calctime(); 
