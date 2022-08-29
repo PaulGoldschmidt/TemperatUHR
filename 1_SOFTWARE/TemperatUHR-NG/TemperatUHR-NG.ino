@@ -1,16 +1,21 @@
+/*
+   TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Hardware Version 2.0+)
+   Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
+   Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
+*/
+
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <DNSServer.h>
 #include <ESP8266mDNS.h>
 #include <EEPROM.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <BlynkSimpleEsp8266.h>
 
-/*
- * TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
- * Software Version: 0.1-PRE
- * Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
- * Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
- */
+/* Software Version */
+#define SoftwareVer "1.0-STABLE"
 
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
 
@@ -22,7 +27,7 @@ const char *myHostname = "temperatUHR";
 /* Don't set this wifi credentials. They are configurated at runtime and stored on EEPROM */
 char ssid[33] = "";
 char password[65] = "";
-char token[110] = "";
+char auth[110] = "";
 
 // DNS server
 const byte DNS_PORT = 53;
@@ -45,33 +50,47 @@ unsigned long lastConnectTry = 0;
 /** Current WLAN status */
 unsigned int status = WL_IDLE_STATUS;
 
+/* Hardware Configuration */
+static const short int BUILTIN_LED0 = D0; //GPIO0: Build-In LED
+static const short int SENSOR = D5; // Dallas DS18B20 Data Pin
+static const short int RED_LED = D6; // Red LED Pin
+static const short int GREEN_LED = D8; // Green LED Pin
+static const short int BLUE_LED = D7; // Blue LED Pin
+
+#define ONE_WIRE_BUS 14 //the sensor is connected to pin #14
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+float temperature;
+
+/* Blynk Configuration */
+#define BLYNK_PRINT Serial //if needed: Debug console
+WidgetLED led1(V2); //an virtual LED is in the app "connected" to V2.
+
+unsigned int distancetosensor;
+int targettemperature;
+bool internetavailable = false;
+bool firstinternet = false;
+bool temperatuhrstandby = false;
+bool cooldownmode = false;
+int timestilltarget[5] = {222}; // initalize array with impossible values so that we can firstly check if array has been written to
+int positioninarray = 0;
+
 void setup() {
-  delay(1000);
+  delay(100);
   Serial.begin(115200);
-  Serial.println();
-  Serial.println("Configuring access point...");
-  /* You can remove the password parameter if you want the AP to be open. */
-  WiFi.softAPConfig(apIP, apIP, netMsk);
-  WiFi.softAP(softAP_ssid);
-  delay(500); // Without delay I've seen the IP address blank
-  Serial.print("AP IP address: ");
-  Serial.println(WiFi.softAPIP());
-
-  /* Setup the DNS server redirecting all the domains to the apIP */
-  dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
-  dnsServer.start(DNS_PORT, "*", apIP);
-
-  /* Setup web pages: root, wifi config pages, SO captive portal detectors and not found. */
-  server.on("/", handleRoot);
-  server.on("/wifi", handleWifi);
-  server.on("/wifisave", handleWifiSave);
-  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
-  server.onNotFound(handleNotFound);
-  server.begin(); // Web server start
-  Serial.println("HTTP server started");
-  loadCredentials(); // Load WLAN credentials from network
-  connect = strlen(ssid) > 0; // Request WLAN connect if there is a SSID
+  Serial.println("Hallo, world! TemperatUHR starting...");
+  pinMode(BUILTIN_LED0, OUTPUT); // Initialize the BUILTIN_LED1 pin as an output
+  pinMode(RED_LED, OUTPUT); // Initialize the red pin as an output
+  pinMode(GREEN_LED, OUTPUT); // Initialize the green pin as an output
+  pinMode(BLUE_LED, OUTPUT); // Initialize the blue pin as an output
+  digitalWrite(RED_LED, LOW); // Pull to LOW: Led ON
+  digitalWrite(GREEN_LED, LOW); // Pull to LOW: Led ON
+  digitalWrite(BLUE_LED, LOW); // Pull to LOW: Led ON
+  runsensor(); //get temp & check sensor
+  initCaptive();
+  digitalWrite(RED_LED, HIGH); // Pull to HIGH: Led OFF
+  digitalWrite(GREEN_LED, HIGH); // Pull to HIGH: Led OFF
+  digitalWrite(BLUE_LED, HIGH); // Pull to HIGH: Led OFF
 }
 
 void connectWifi() {
@@ -84,6 +103,13 @@ void connectWifi() {
 }
 
 void loop() {
+  if (!internetavailable) {
+    digitalWrite(BLUE_LED, LOW); // Pull to LOW: Led ON
+    if (WiFi.status() == WL_CONNECTED) { //is internet available?
+      internetavailable = true;
+      firstinternet = true;
+    }
+  }
   if (connect) {
     Serial.println("Connect requested");
     connect = false;
@@ -125,9 +151,32 @@ void loop() {
       MDNS.update();
     }
   }
+
   // Do work:
   //DNS
   dnsServer.processNextRequest();
   //HTTP
   server.handleClient();
+
+  if (firstinternet) {
+    digitalWrite(BLUE_LED, HIGH); //Now with internet, we can turn off the blue LED
+    Serial.println("Internet first connected, setting up connections.");
+    delay(500);
+    Blynk.config(auth, "blynk.cloud", 80);
+    firstinternet = false;
+  }
+
+  if (internetavailable) {
+    Serial.println("\nWorker process: Cloud");
+    runsensor();
+    Blynk.virtualWrite(V0, temperature);
+    calctime(); 
+    if (strlen(auth) > 10) {
+      digitalWrite(GREEN_LED, LOW);
+      Blynk.run();
+      delay(250);
+      digitalWrite(GREEN_LED, HIGH);
+    }
+  }
+  delay(500);
 }

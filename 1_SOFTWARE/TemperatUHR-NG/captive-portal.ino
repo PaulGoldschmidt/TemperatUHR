@@ -1,20 +1,27 @@
+/*
+   TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
+   Software Version: 0.2-PRE
+   Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
+   Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
+*/
+
 /** Load WLAN credentials from EEPROM */
 void loadCredentials() {
   EEPROM.begin(512);
   EEPROM.get(0, ssid);
   EEPROM.get(0 + sizeof(ssid), password);
-  EEPROM.get(0 + sizeof(ssid) + sizeof(password), token);
+  EEPROM.get(0 + sizeof(ssid) + sizeof(password), auth);
   char ok[2 + 1];
-  EEPROM.get(0 + sizeof(ssid) + sizeof(password) + sizeof(token), ok);
+  EEPROM.get(0 + sizeof(ssid) + sizeof(password) + sizeof(auth), ok);
   EEPROM.end();
   if (String(ok) != String("OK")) {
     ssid[0] = 0;
     password[0] = 0;
-    token[0] = 0;
+    auth[0] = 0;
   }
   Serial.println("Recovered credentials:");
   Serial.println(ssid);
-  Serial.println(strlen(token) > 0 ? "********" : "<no token>");
+  Serial.println(strlen(auth) > 10 ? "********" : "<no auth>");
   Serial.println(strlen(password) > 0 ? "********" : "<no password>");
 }
 
@@ -23,13 +30,39 @@ void saveCredentials() {
   EEPROM.begin(512);
   EEPROM.put(0, ssid);
   EEPROM.put(0 + sizeof(ssid), password);
-  EEPROM.put(0 + sizeof(ssid) + sizeof(password), token);
+  EEPROM.put(0 + sizeof(ssid) + sizeof(password), auth);
   char ok[2 + 1] = "OK";
-  EEPROM.put(0 + sizeof(ssid) + sizeof(password) + sizeof(token), ok);
+  EEPROM.put(0 + sizeof(ssid) + sizeof(password) + sizeof(auth), ok);
   EEPROM.commit();
   EEPROM.end();
 }
 
+void initCaptive() {
+  Serial.println();
+  Serial.println("Configuring access point...");
+  /* You can remove the password parameter if you want the AP to be open. */
+  WiFi.softAPConfig(apIP, apIP, netMsk);
+  WiFi.softAP(softAP_ssid);
+  delay(500); // Without delay I've seen the IP address blank
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.softAPIP());
+
+  /* Setup the DNS server redirecting all the domains to the apIP */
+  dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
+  dnsServer.start(DNS_PORT, "*", apIP);
+
+  /* Setup web pages: root, wifi config pages, SO captive portal detectors and not found. */
+  server.on("/", handleRoot);
+  server.on("/wifi", handleWifi);
+  server.on("/wifisave", handleWifiSave);
+  server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
+  server.onNotFound(handleNotFound);
+  server.begin(); // Web server start
+  Serial.println("HTTP server started");
+  loadCredentials(); // Load WLAN credentials from network
+  connect = strlen(ssid) > 0; // Request WLAN connect if there is a SSID
+}
 
 /** Handle root or redirect to captive portal */
 void handleRoot() {
@@ -44,17 +77,39 @@ void handleRoot() {
   Page += F(
             "<!DOCTYPE html><html lang='en'><head>"
             "<meta name='viewport' content='width=device-width'>"
-            "<title>CaptivePortal</title></head><body>"
-            "<h1>HELLO WORLD!!</h1>");
+            "<title>TemperatUHR Configuration</title>"
+            "<style>"
+            "p {"
+            "text-align: center;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            " h1 {"
+            "text-align: center;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            " footer {"
+            "font-size: small"
+            "}"
+            "</style>"
+            "<link rel=\"icon\" type=\"image/png\" href=\"https://raw.githubusercontent.com/PaulGoldschmidt/TemperatUHR/957ae12ab24a839e0a884f5f338c3e0124b183e1/3_RESOURCES/Logo/favicon-32x32.png\" sizes=\"32x32\" />"
+            "<link rel=\"icon\" type=\"image/png\" href=\"https://raw.githubusercontent.com/PaulGoldschmidt/TemperatUHR/957ae12ab24a839e0a884f5f338c3e0124b183e1/3_RESOURCES/Logo/favicon-16x16.png\" sizes=\"16x16\" />"
+            "</head><body>");
+  server.sendContent(Page); //send what we have so far
+            TemperatUHRlogo();
+  Page = "<h1>TemperatUHR Configuration Webapp</h1>"; //clear string and start with heading 
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
   } else {
-    Page += String(F("<p>You are connected through the wifi network: ")) + ssid + F("</p>");
+    Page += String(F("<p>You are connected through the WLAN network: ")) + ssid + F("</p>");
   }
   Page += F(
-            "<p>You may want to <a href='/wifi'>config the wifi connection</a>.</p>"
+            "<p>You may want to <a href='/wifi'>config the WLAN connection and add an Blynk Token</a>.</p>"
+            "<footer>"
+            "<p>TemperatUHR: A project by <a href=\"https://www.paul-goldschmidt.de/\">Paul Goldschmidt</a><br>");
+  Page += String(F("In cooperation with the <a href=\"https://www.paul-award.de/\">PAUL AWARD</a> / <a href=\"https://www.fed.de/\">FED e.V.</a> | Software Version: <a href=\"https://github.com/PaulGoldschmidt/TemperatUHR/releases/\">")) + String(SoftwareVer) + String(F("</a></p>"));
+  Page += F(
+            "</footer>"
             "</body></html>");
-
   server.send(200, "text/html", Page);
 }
 
@@ -79,18 +134,54 @@ void handleWifi() {
   String Page;
   Page += F(
             "<!DOCTYPE html><html lang='en'><head>"
+            "<style>"
+            "p {"
+            "text-align: center;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            " h1 {"
+            "text-align: center;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            " table {"
+            "text-align: center;"
+            "margin-left:auto;"
+            "margin-right:auto;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            " form {"
+            "text-align: center;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            " input, textarea, select, button {"
+            "padding: 0px;"
+            "margin: 3px;"
+            "box-sizing: border-box;"
+            "}"
+            " th, td {"
+            "padding: 5px;"
+            "}"
+            " footer {"
+            "font-size: small"
+            "}"
+            "</style>"
             "<meta name='viewport' content='width=device-width'>"
-            "<title>CaptivePortal</title></head><body>"
-            "<h1>Wifi config</h1>");
+            "<link rel=\"icon\" type=\"image/png\" href=\"https://raw.githubusercontent.com/PaulGoldschmidt/TemperatUHR/957ae12ab24a839e0a884f5f338c3e0124b183e1/3_RESOURCES/Logo/favicon-32x32.png\" sizes=\"32x32\" />"
+            "<link rel=\"icon\" type=\"image/png\" href=\"https://raw.githubusercontent.com/PaulGoldschmidt/TemperatUHR/957ae12ab24a839e0a884f5f338c3e0124b183e1/3_RESOURCES/Logo/favicon-16x16.png\" sizes=\"16x16\" />"
+            "<title>TemperatUHR Credentials Configuration</title></head><body>");
+            server.sendContent(Page); 
+            TemperatUHRlogo();
+  Page = "<h1>TemperatUHR Credentials Configuration</h1>";
+            
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
   } else {
-    Page += String(F("<p>You are connected through the wifi network: ")) + ssid + F("</p>");
+    Page += String(F("<p>You are connected through the WLAN network: ")) + ssid + F("</p>");
   }
   Page +=
     String(F(
              "\r\n<br />"
-             "<table><tr><th align='left'>SoftAP config</th></tr>"
+             "<table><tr><th>TemperatUHR Hotspot Information</th></tr>"
              "<tr><td>SSID ")) +
     String(softAP_ssid) +
     F("</td></tr>"
@@ -99,8 +190,8 @@ void handleWifi() {
     F("</td></tr>"
       "</table>"
       "\r\n<br />"
-      "<table><tr><th align='left'>WLAN config</th></tr>"
-      "<tr><td>SSID ") +
+      "<table><tr><th>WLAN Configuration  </th></tr>"
+      "<tr><td>SSID: ") +
     String(ssid) +
     F("</td></tr>"
       "<tr><td>IP ") +
@@ -108,25 +199,38 @@ void handleWifi() {
     F("</td></tr>"
       "</table>"
       "\r\n<br />"
-      "<table><tr><th align='left'>WLAN list (refresh if any missing)</th></tr>");
+      "<table><tr><th>WLAN list (SSID / Password Required / Signal Strengh)</th></tr>");
   Serial.println("scan start");
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
   if (n > 0) {
     for (int i = 0; i < n; i++) {
-      Page += String(F("\r\n<tr><td>SSID ")) + WiFi.SSID(i) + ((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? F(" ") : F(" *")) + F(" (") + WiFi.RSSI(i) + F(")</td></tr>");
+      Page += String(F("\r\n<tr><td>")) + WiFi.SSID(i) + F(" / ") + ((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? F(" No") : F(" Yes")) + + F(" / ") + WiFi.RSSI(i) +  F("dBm</td></tr>");
     }
   } else {
     Page += F("<tr><td>No WLAN found</td></tr>");
   }
   Page += F(
             "</table>"
+            "<p style=\"font-size: small\">Refresh page if any WLAN misses from this list.</p>"
             "\r\n<br /><form method='POST' action='wifisave'><h4>Connect to network:</h4>"
-            "<input type='text' placeholder='Network' name='n'/>"
+            "<select name='n'>");
+            if (n > 0) {
+            for (int i = 0; i < n; i++) {
+  Page += String(F("<option value='")) + WiFi.SSID(i) + String(F("'>")) + WiFi.SSID(i) + String(F("</option>"));
+            }
+            }
+  Page += F(
+            "</select>"
             "<br /><input type='password' placeholder='Password' name='p'/>"
-            "<br /><input type='password' placeholder='Blynk Auth Token' name='b'/>"
-            "<br /><input type='submit' value='Connect/Disconnect'/></form>"
+            "<br /><input type='text' placeholder='Blynk Auth Token' name='b'/>"
+            "<br /><br /><input type='submit' value='Connect/Disconnect'/></form>"
             "<p>You may want to <a href='/'>return to the home page</a>.</p>"
+            "<footer>"
+            "<p>TemperatUHR: A project by <a href=\"https://www.paul-goldschmidt.de/\">Paul Goldschmidt</a><br>");
+  Page += String(F("In cooperation with the <a href=\"https://www.paul-award.de/\">PAUL AWARD</a> / <a href=\"https://www.fed.de/\">FED e.V.</a> | Software Version: <a href=\"https://github.com/PaulGoldschmidt/TemperatUHR/releases/\">")) + String(SoftwareVer) + String(F("</a></p>"));
+  Page += F(
+            "</footer>"
             "</body></html>");
   server.send(200, "text/html", Page);
   server.client().stop(); // Stop is needed because we sent no content length
@@ -137,7 +241,7 @@ void handleWifiSave() {
   Serial.println("wifi save");
   server.arg("n").toCharArray(ssid, sizeof(ssid) - 1);
   server.arg("p").toCharArray(password, sizeof(password) - 1);
-  server.arg("b").toCharArray(token, sizeof(token) - 1);
+  server.arg("b").toCharArray(auth, sizeof(auth) - 1);
   server.sendHeader("Location", "wifi", true);
   server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   server.sendHeader("Pragma", "no-cache");
@@ -149,7 +253,7 @@ void handleWifiSave() {
 }
 
 void handleNotFound() {
-  if (captivePortal()) { // If caprive portal redirect instead of displaying the error page.
+  if (captivePortal()) { // If captive portal redirect instead of displaying the error page.
     return;
   }
   String message = F("File Not Found\n\n");
@@ -168,25 +272,4 @@ void handleNotFound() {
   server.sendHeader("Pragma", "no-cache");
   server.sendHeader("Expires", "-1");
   server.send(404, "text/plain", message);
-}
-
-/** Is this an IP? */
-boolean isIp(String str) {
-  for (size_t i = 0; i < str.length(); i++) {
-    int c = str.charAt(i);
-    if (c != '.' && (c < '0' || c > '9')) {
-      return false;
-    }
-  }
-  return true;
-}
-
-/** IP to String? */
-String toStringIp(IPAddress ip) {
-  String res = "";
-  for (int i = 0; i < 3; i++) {
-    res += String((ip >> (8 * i)) & 0xFF) + ".";
-  }
-  res += String(((ip >> 8 * 3)) & 0xFF);
-  return res;
 }
