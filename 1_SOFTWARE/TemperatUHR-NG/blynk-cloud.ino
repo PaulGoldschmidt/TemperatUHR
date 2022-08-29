@@ -84,7 +84,7 @@ void temperatuhrstandbycheck() { //avoiding hysterisis and notifying the user ab
   }
 }
 
-int tempdifference() { // calculate the temperature between the current temperature and the goal temperature.
+float tempdifference() { // calculate the temperature between the current temperature and the goal temperature.
   int tempdifferencecalc;
   if (cooldownmode == false) {
     tempdifferencecalc = targettemperature - temperature;
