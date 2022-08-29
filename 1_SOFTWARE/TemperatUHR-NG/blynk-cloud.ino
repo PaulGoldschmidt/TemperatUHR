@@ -34,11 +34,10 @@ void calctime() {
   int timetosensor = distancetosensor / walkspeed;
   int timetillnotification = timetilltarget - timetosensor;
   if ((timetillnotification <= 0) && (temperatuhrstandby == false)) {
-    Blynk.notify("Quick! Soon TemperatUHR will reach the target temperature."); //TODO: Check Notifications
+    Blynk.logEvent("temperature_reached", "Quick! Soon TemperatUHR will reach the target temperature."); //TODO: Check Notifications
     Serial.println("Notification send.");
     temperatuhrstandby = true; // set temperatuhr into standby, so that there won't be a second notification
   }
-  
   if (tempdifference() <= 0) {
     Blynk.virtualWrite(V3, 1); //Turn LED on in App
   }
