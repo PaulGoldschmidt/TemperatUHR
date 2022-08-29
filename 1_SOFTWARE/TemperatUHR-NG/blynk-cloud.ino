@@ -23,13 +23,19 @@ void runsensor() {
 
 void calctime() {
   float walkspeed = 1; //walking speed in m/s; 1 m/s standart, change if necessary
+  int timetilltarget;
   sensors.requestTemperatures(); //request temp sensor data
   int oldtemperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
   delay(1500); //wait for 1.5 Seconds
   sensors.requestTemperatures(); //request temp sensor data
   temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
   float degreespersec = (temperature - oldtemperature) / 1.5;
-  int timetilltarget = tempdifference() / degreespersec;
+  if (degreespersec >= 0.3) { //cross out devision by zero resulting in notification hysterisis
+    timetilltarget = tempdifference() / degreespersec;
+  }
+  else {
+    timetilltarget = 9999;
+  }
   Blynk.virtualWrite(V2, timetilltarget);
   int timetosensor = distancetosensor / walkspeed;
   int timetillnotification = timetilltarget - timetosensor;
@@ -43,19 +49,17 @@ void calctime() {
   }
   else {
     Blynk.virtualWrite(V3, 0);
-    }
+  }
 }
 
 void temperatuhrstandbycheck() { //avoiding hysterisis and notifying the user about the current status.
-  if (tempdifference() > 5) {
-    temperatuhrstandby = false;
+  if (temperatuhrstandby == false) {
     digitalWrite(BLUE_LED, HIGH);
-    analogWrite(RED_LED, 10);
+    analogWrite(RED_LED, 1);
   }
-
-  if (temperatuhrstandby == true) {
+  else {
     digitalWrite(RED_LED, HIGH);
-    analogWrite(BLUE_LED, 10);
+    analogWrite(BLUE_LED, 1);
   }
 }
 
@@ -88,4 +92,10 @@ BLYNK_WRITE(V1)
     cooldownmode = true;
     Serial.println("Cooldown mode!");
   }
+  temperatuhrstandby = false;
+}
+
+BLYNK_CONNECTED() {
+    Blynk.syncAll();
+    Serial.println("Synced settings: " + String(targettemperature) + " Degrees as target temperature, " + String(distancetosensor) + " Meters as distance to sensor.");
 }
