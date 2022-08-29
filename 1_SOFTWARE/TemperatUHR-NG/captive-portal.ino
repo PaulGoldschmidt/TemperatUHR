@@ -88,8 +88,10 @@ void handleRoot() {
             "font-family: Arial, Helvetica, sans-serif;"
             "}"
             "</style>"
-            "</head><body>"
-            "<h1>TemperatUHR Configuration Webapp</h1>");
+            "</head><body>");
+  server.sendContent(Page); //send what we have so far
+            TemperatUHRlogo();
+  Page = "<h1>TemperatUHR Configuration Webapp</h1>"; //clear string and start with heading 
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
   } else {
@@ -97,8 +99,12 @@ void handleRoot() {
   }
   Page += F(
             "<p>You may want to <a href='/wifi'>config the WLAN connection and add an Blynk Token</a>.</p>"
+            "<footer>"
+            "<p>TemperatUHR: A project by <a href=\"https://www.paul-goldschmidt.de/\">Paul Goldschmidt</a><br>");
+  Page += String(F("In cooperation with the <a href=\"https://www.paul-award.de/\">PAUL AWARD</a> / <a href=\"https://www.fed.de/\">FED e.V.</a> | Software Version: <a href=\"https://github.com/PaulGoldschmidt/TemperatUHR/releases/\">")) + String(SoftwareVer) + String(F("</a></p>"));
+  Page += F(
+            "</footer>"
             "</body></html>");
-
   server.send(200, "text/html", Page);
 }
 
@@ -155,8 +161,11 @@ void handleWifi() {
             "}"
             "</style>"
             "<meta name='viewport' content='width=device-width'>"
-            "<title>TemperatUHR Credentials Configuration</title></head><body>"
-            "<h1>TemperatUHR Credentials Configuration</h1>");
+            "<title>TemperatUHR Credentials Configuration</title></head><body>");
+            server.sendContent(Page); 
+            TemperatUHRlogo();
+  Page = "<h1>TemperatUHR Credentials Configuration</h1>";
+            
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
   } else {
