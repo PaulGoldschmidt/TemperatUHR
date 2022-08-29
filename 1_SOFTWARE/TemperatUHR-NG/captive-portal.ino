@@ -96,7 +96,7 @@ void handleRoot() {
     Page += String(F("<p>You are connected through the wifi network: ")) + ssid + F("</p>");
   }
   Page += F(
-            "<p>You may want to <a href='/wifi'>config the wifi connection and add an Blynk Token.</a>.</p>"
+            "<p>You may want to <a href='/wifi'>config the wifi connection and add an Blynk Token</a>.</p>"
             "</body></html>");
 
   server.send(200, "text/html", Page);
@@ -123,9 +123,29 @@ void handleWifi() {
   String Page;
   Page += F(
             "<!DOCTYPE html><html lang='en'><head>"
+            "<style>"
+            "p {"
+            "text-align: center;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            " h1 {"
+            "text-align: center;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            " table {"
+            "text-align: center;"
+            "margin-left:auto;"
+            "margin-right:auto;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            " form {"
+            "text-align: center;"
+            "font-family: Arial, Helvetica, sans-serif;"
+            "}"
+            "</style>"
             "<meta name='viewport' content='width=device-width'>"
-            "<title>CaptivePortal</title></head><body>"
-            "<h1>Wifi config</h1>");
+            "<title>TemperatUHR Credentials Configuration</title></head><body>"
+            "<h1>TemperatUHR Credentials Configuration</h1>");
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
   } else {
@@ -134,7 +154,7 @@ void handleWifi() {
   Page +=
     String(F(
              "\r\n<br />"
-             "<table><tr><th align='left'>SoftAP config</th></tr>"
+             "<table><tr><th>SoftAP Information</th></tr>"
              "<tr><td>SSID ")) +
     String(softAP_ssid) +
     F("</td></tr>"
@@ -143,7 +163,7 @@ void handleWifi() {
     F("</td></tr>"
       "</table>"
       "\r\n<br />"
-      "<table><tr><th align='left'>WLAN config</th></tr>"
+      "<table><tr><th>WLAN Configuration  </th></tr>"
       "<tr><td>SSID ") +
     String(ssid) +
     F("</td></tr>"
@@ -152,7 +172,7 @@ void handleWifi() {
     F("</td></tr>"
       "</table>"
       "\r\n<br />"
-      "<table><tr><th align='left'>WLAN list (refresh if any missing)</th></tr>");
+      "<table><tr><th>WLAN list (refresh if any missing)</th></tr>");
   Serial.println("scan start");
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
@@ -168,7 +188,7 @@ void handleWifi() {
             "\r\n<br /><form method='POST' action='wifisave'><h4>Connect to network:</h4>"
             "<input type='text' placeholder='Network' name='n'/>"
             "<br /><input type='password' placeholder='Password' name='p'/>"
-            "<br /><input type='password' placeholder='Blynk Auth auth' name='b'/>"
+            "<br /><input type='password' placeholder='Blynk Auth Token' name='b'/>"
             "<br /><input type='submit' value='Connect/Disconnect'/></form>"
             "<p>You may want to <a href='/'>return to the home page</a>.</p>"
             "</body></html>");
