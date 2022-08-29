@@ -142,6 +142,17 @@ void handleWifi() {
             "text-align: center;"
             "font-family: Arial, Helvetica, sans-serif;"
             "}"
+            " input, textarea, select, button {"
+            "padding: 0px;"
+            "margin: 3px;"
+            "box-sizing: border-box;"
+            "}"
+            " th, td {"
+            "padding: 5px;"
+            "}"
+            " footer {"
+            "font-size: small"
+            "}"
             "</style>"
             "<meta name='viewport' content='width=device-width'>"
             "<title>TemperatUHR Credentials Configuration</title></head><body>"
@@ -164,7 +175,7 @@ void handleWifi() {
       "</table>"
       "\r\n<br />"
       "<table><tr><th>WLAN Configuration  </th></tr>"
-      "<tr><td>SSID ") +
+      "<tr><td>SSID: ") +
     String(ssid) +
     F("</td></tr>"
       "<tr><td>IP ") +
@@ -186,11 +197,23 @@ void handleWifi() {
   Page += F(
             "</table>"
             "\r\n<br /><form method='POST' action='wifisave'><h4>Connect to network:</h4>"
-            "<input type='text' placeholder='Network' name='n'/>"
+            "<select name='n'>");
+            if (n > 0) {
+            for (int i = 0; i < n; i++) {
+  Page += String(F("<option value='")) + WiFi.SSID(i) + String(F("'>")) + WiFi.SSID(i) + String(F("</option>"));
+            }
+            }
+  Page += F(
+            "</select>"
             "<br /><input type='password' placeholder='Password' name='p'/>"
-            "<br /><input type='password' placeholder='Blynk Auth Token' name='b'/>"
-            "<br /><input type='submit' value='Connect/Disconnect'/></form>"
+            "<br /><input type='text' placeholder='Blynk Auth Token' name='b'/>"
+            "<br /><br /><input type='submit' value='Connect/Disconnect'/></form>"
             "<p>You may want to <a href='/'>return to the home page</a>.</p>"
+            "<footer>"
+            "<p>TemperatUHR: A project by Paul Goldschmidt<br>");
+  Page += String(F("In cooperation with the <a href=\"https://www.paul-award.de/\">PAUL AWARD</a> / <a href=\"https://www.fed.de/\">FED e.V.</a> | Software Version: <a href=\"https://github.com/PaulGoldschmidt/TemperatUHR/releases/\">")) + String(SoftwareVer) + String(F("</a></p>"));
+  Page += F(
+            "</footer>"
             "</body></html>");
   server.send(200, "text/html", Page);
   server.client().stop(); // Stop is needed because we sent no content length
@@ -213,7 +236,7 @@ void handleWifiSave() {
 }
 
 void handleNotFound() {
-  if (captivePortal()) { // If caprive portal redirect instead of displaying the error page.
+  if (captivePortal()) { // If captive portal redirect instead of displaying the error page.
     return;
   }
   String message = F("File Not Found\n\n");
