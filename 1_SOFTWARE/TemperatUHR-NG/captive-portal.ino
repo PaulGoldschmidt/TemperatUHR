@@ -93,10 +93,10 @@ void handleRoot() {
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
   } else {
-    Page += String(F("<p>You are connected through the wifi network: ")) + ssid + F("</p>");
+    Page += String(F("<p>You are connected through the WLAN network: ")) + ssid + F("</p>");
   }
   Page += F(
-            "<p>You may want to <a href='/wifi'>config the wifi connection and add an Blynk Token</a>.</p>"
+            "<p>You may want to <a href='/wifi'>config the WLAN connection and add an Blynk Token</a>.</p>"
             "</body></html>");
 
   server.send(200, "text/html", Page);
@@ -160,7 +160,7 @@ void handleWifi() {
   if (server.client().localIP() == apIP) {
     Page += String(F("<p>You are connected through the soft AP: ")) + softAP_ssid + F("</p>");
   } else {
-    Page += String(F("<p>You are connected through the wifi network: ")) + ssid + F("</p>");
+    Page += String(F("<p>You are connected through the WLAN network: ")) + ssid + F("</p>");
   }
   Page +=
     String(F(
@@ -183,19 +183,20 @@ void handleWifi() {
     F("</td></tr>"
       "</table>"
       "\r\n<br />"
-      "<table><tr><th>WLAN list (refresh if any missing)</th></tr>");
+      "<table><tr><th>WLAN list (SSID, Encryption Type, Signal Strengh)</th></tr>");
   Serial.println("scan start");
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
   if (n > 0) {
     for (int i = 0; i < n; i++) {
-      Page += String(F("\r\n<tr><td>SSID ")) + WiFi.SSID(i) + ((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? F(" ") : F(" *")) + F(" (") + WiFi.RSSI(i) + F(")</td></tr>");
+      Page += String(F("\r\n<tr><td>")) + WiFi.SSID(i) + F(" / ") + ((WiFi.encryptionType(i) == ENC_TYPE_NONE) ? F(" -") : F(" *")) + + F(" / ") + WiFi.RSSI(i) +  F("dBm</td></tr>");
     }
   } else {
     Page += F("<tr><td>No WLAN found</td></tr>");
   }
   Page += F(
             "</table>"
+            "<p style=\"font-size: small\">Refresh page if any WLAN misses from this list.</p>"
             "\r\n<br /><form method='POST' action='wifisave'><h4>Connect to network:</h4>"
             "<select name='n'>");
             if (n > 0) {
@@ -210,7 +211,7 @@ void handleWifi() {
             "<br /><br /><input type='submit' value='Connect/Disconnect'/></form>"
             "<p>You may want to <a href='/'>return to the home page</a>.</p>"
             "<footer>"
-            "<p>TemperatUHR: A project by Paul Goldschmidt<br>");
+            "<p>TemperatUHR: A project by <a href=\"https://www.paul-goldschmidt.de/\">Paul Goldschmidt</a><br>");
   Page += String(F("In cooperation with the <a href=\"https://www.paul-award.de/\">PAUL AWARD</a> / <a href=\"https://www.fed.de/\">FED e.V.</a> | Software Version: <a href=\"https://github.com/PaulGoldschmidt/TemperatUHR/releases/\">")) + String(SoftwareVer) + String(F("</a></p>"));
   Page += F(
             "</footer>"
