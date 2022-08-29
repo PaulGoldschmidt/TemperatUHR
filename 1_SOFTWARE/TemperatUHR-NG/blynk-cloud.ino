@@ -30,21 +30,21 @@ void calctime() {
   sensors.requestTemperatures(); //request temp sensor data
   temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
   float degreespersec = (temperature - oldtemperature) / 1.5;
-  if (degreespersec >= 0.3) { //cross out devision by zero resulting in notification hysterisis
+  if ((degreespersec >= 0.3) && (degreespersec <= 90)) { //cross out devision by zero resulting in notification hysterisis
     timetilltarget = tempdifference() / degreespersec;
     while (timestilltarget[0] == 222) { //checks if array is still filled with impossible values and writes to every element the current time till target
-      Serial.print("Initailizing averaging array.");
-      for (int i = 0 ; i < 10 ; i++) {
+      Serial.println("Initailizing averaging array.");
+      for (int i = 0 ; i < 5 ; i++) {
         timestilltarget[i] = timetilltarget;
       }
     }
     timestilltarget[positioninarray] = timetilltarget;
     positioninarray++;
-    Serial.println("Postition in array: " + String(positioninarray) + " | Median time till Target: " + String(average(timestilltarget, 10)) + " Seconds");
-    if (positioninarray >= 9) {
+    Serial.println("Postition in array: " + String(positioninarray) + " | Median time till Target: " + String(average(timestilltarget, 5)) + " Seconds");
+    if (positioninarray >= 4) { //prevent writing to illigal memory positions
       positioninarray = 0;
     }
-    Blynk.virtualWrite(V2, average(timestilltarget, 10));
+    Blynk.virtualWrite(V2, average(timestilltarget, 5));
   }
   else {
     timetilltarget = 999999;
@@ -52,7 +52,7 @@ void calctime() {
   int timetosensor = distancetosensor / walkspeed;
   int timetillnotification = timetilltarget - timetosensor;
   if ((timetillnotification <= 0) && (temperatuhrstandby == false)) {
-    Blynk.logEvent("temperature_reached", "Quick! Soon TemperatUHR will reach the target temperature."); //TODO: Check Notifications
+    Blynk.logEvent("temperature_reached", "Quick! Soon TemperatUHR will reach the target temperature.");
     Serial.println("Notification send.");
     temperatuhrstandby = true; // set temperatuhr into standby, so that there won't be a second notification
   }
