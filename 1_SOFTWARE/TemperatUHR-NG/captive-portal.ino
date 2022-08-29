@@ -192,7 +192,7 @@ void handleWifi() {
     F("</td></tr>"
       "</table>"
       "\r\n<br />"
-      "<table><tr><th>WLAN list (SSID, Encryption Type, Signal Strengh)</th></tr>");
+      "<table><tr><th>WLAN list (SSID / Encryption Type / Signal Strengh)</th></tr>");
   Serial.println("scan start");
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
