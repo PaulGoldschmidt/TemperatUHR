@@ -70,6 +70,8 @@ bool internetavailable = false;
 bool firstinternet = false;
 bool temperatuhrstandby = false;
 bool cooldownmode = false;
+int timestilltarget[10] = {222}; // initalize array with impossible values so that we can firstly check if array has been written to
+int positioninarray = 0;
 
 void setup() {
   delay(100);

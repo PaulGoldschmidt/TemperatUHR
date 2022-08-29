@@ -32,11 +32,23 @@ void calctime() {
   float degreespersec = (temperature - oldtemperature) / 1.5;
   if (degreespersec >= 0.3) { //cross out devision by zero resulting in notification hysterisis
     timetilltarget = tempdifference() / degreespersec;
+    while (timestilltarget[0] == 222) { //checks if array is still filled with impossible values and writes to every element the current time till target
+      Serial.print("Initailizing averaging array.");
+      for (int i = 0 ; i < 10 ; i++) {
+        timestilltarget[i] = timetilltarget;
+      }
+    }
+    timestilltarget[positioninarray] = timetilltarget;
+    positioninarray++;
+    Serial.println("Postition in array: " + String(positioninarray) + " | Median time till Target: " + String(average(timestilltarget, 10)) + " Seconds");
+    if (positioninarray >= 9) {
+      positioninarray = 0;
+    }
+    Blynk.virtualWrite(V2, average(timestilltarget, 10));
   }
   else {
-    timetilltarget = 9999;
+    timetilltarget = 999999;
   }
-  Blynk.virtualWrite(V2, timetilltarget);
   int timetosensor = distancetosensor / walkspeed;
   int timetillnotification = timetilltarget - timetosensor;
   if ((timetillnotification <= 0) && (temperatuhrstandby == false)) {

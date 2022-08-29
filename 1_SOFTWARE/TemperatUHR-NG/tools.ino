@@ -25,3 +25,11 @@ String toStringIp(IPAddress ip) {
   res += String(((ip >> 8 * 3)) & 0xFF);
   return res;
 }
+
+float average(int * array, int len)  // assuming array is int.
+{
+  long sum = 0L ;  // sum will be larger than an item, long for safety.
+  for (int i = 0 ; i < len ; i++)
+    sum += array [i] ;
+  return  ((float) sum) / len ;  // average will be fractional, so float may be appropriate.
+}
