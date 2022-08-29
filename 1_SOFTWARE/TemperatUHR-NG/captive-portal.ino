@@ -54,8 +54,6 @@ void initCaptive() {
   /* Setup web pages: root, wifi config pages, SO captive portal detectors and not found. */
   server.on("/", handleRoot);
   server.on("/wifi", handleWifi);
-  server.on("/favicon-32x32.png", favicon32x32);
-  server.on("/favicon-16x16.png", favicon16x16);
   server.on("/wifisave", handleWifiSave);
   server.on("/generate_204", handleRoot);  //Android captive portal. Maybe not needed. Might be handled by notFound handler.
   server.on("/fwlink", handleRoot);  //Microsoft captive portal. Maybe not needed. Might be handled by notFound handler.
@@ -89,9 +87,12 @@ void handleRoot() {
             "text-align: center;"
             "font-family: Arial, Helvetica, sans-serif;"
             "}"
+            " footer {"
+            "font-size: small"
+            "}"
             "</style>"
-            "<link rel=\"icon\" type=\"image/png\" href=\"favicon-32x32.png\" sizes=\"32x32\" />"
-            "<link rel=\"icon\" type=\"image/png\" href=\"favicon-16x16.png\" sizes=\"16x16\" />"
+            "<link rel=\"icon\" type=\"image/png\" href=\"https://raw.githubusercontent.com/PaulGoldschmidt/TemperatUHR/957ae12ab24a839e0a884f5f338c3e0124b183e1/3_RESOURCES/Logo/favicon-32x32.png\" sizes=\"32x32\" />"
+            "<link rel=\"icon\" type=\"image/png\" href=\"https://raw.githubusercontent.com/PaulGoldschmidt/TemperatUHR/957ae12ab24a839e0a884f5f338c3e0124b183e1/3_RESOURCES/Logo/favicon-16x16.png\" sizes=\"16x16\" />"
             "</head><body>");
   server.sendContent(Page); //send what we have so far
             TemperatUHRlogo();
@@ -165,6 +166,8 @@ void handleWifi() {
             "}"
             "</style>"
             "<meta name='viewport' content='width=device-width'>"
+            "<link rel=\"icon\" type=\"image/png\" href=\"https://raw.githubusercontent.com/PaulGoldschmidt/TemperatUHR/957ae12ab24a839e0a884f5f338c3e0124b183e1/3_RESOURCES/Logo/favicon-32x32.png\" sizes=\"32x32\" />"
+            "<link rel=\"icon\" type=\"image/png\" href=\"https://raw.githubusercontent.com/PaulGoldschmidt/TemperatUHR/957ae12ab24a839e0a884f5f338c3e0124b183e1/3_RESOURCES/Logo/favicon-16x16.png\" sizes=\"16x16\" />"
             "<title>TemperatUHR Credentials Configuration</title></head><body>");
             server.sendContent(Page); 
             TemperatUHRlogo();

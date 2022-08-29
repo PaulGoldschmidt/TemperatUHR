@@ -15,7 +15,7 @@
 #include <BlynkSimpleEsp8266.h>
 
 /* Software Version */
-#define SoftwareVer "0.2-PRE"
+#define SoftwareVer "1.0-STABLE"
 
 /* Set these to your desired softAP credentials. They are not configurable at runtime */
 
