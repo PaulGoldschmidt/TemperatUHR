@@ -49,7 +49,7 @@ void calctime() {
       timestilltarget[positioninarray] = timetilltarget;
       positioninarray++;
       Serial.println("Postition in array: " + String(positioninarray) + " | Median time till Target: " + String(average(timestilltarget, 5)) + " Seconds");
-      if (positioninarray >= 4) { //prevent writing to illigal memory positions
+      if (positioninarray > 4) { //prevent writing to illigal memory positions
         positioninarray = 0;
       }
       Blynk.virtualWrite(V2, average(timestilltarget, 5));
