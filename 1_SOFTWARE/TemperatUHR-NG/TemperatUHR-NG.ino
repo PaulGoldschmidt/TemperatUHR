@@ -74,6 +74,7 @@ bool temperatuhrstandby = false;
 bool cooldownmode = false;
 int timestilltarget[5] = {222}; // initalize array with impossible values so that we can firstly check if array has been written to
 int positioninarray = 0;
+bool blynkconnectionstatus = false;
 
 void setup() {
   delay(100);
@@ -176,6 +177,15 @@ void loop() {
       delay(250);
       digitalWrite(GREEN_LED, HIGH);
     }
+  }
+  blynkconnectionstatus = Blynk.connected();
+  if (blynkconnectionstatus == true) {
+    WiFi.softAPdisconnect(true);
+  }
+  else {
+      if (WiFi.softAP(softAP_ssid) == false) {
+        WiFi.softAP(softAP_ssid);
+      }
   }
   delay(500);
 }
