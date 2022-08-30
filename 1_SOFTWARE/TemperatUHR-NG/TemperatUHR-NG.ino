@@ -171,11 +171,18 @@ void loop() {
     runsensor();
     Blynk.virtualWrite(V0, temperature);
     calctime(); 
-    if (strlen(auth) > 10) {
+    if (strlen(auth) > 30) {
       digitalWrite(GREEN_LED, LOW);
       Blynk.run();
       delay(250);
       digitalWrite(GREEN_LED, HIGH);
+    }
+    else { //error state 1: no blynk token provided
+      digitalWrite(RED_LED, LOW);
+      digitalWrite(GREEN_LED, LOW);
+      delay(250);
+      digitalWrite(GREEN_LED, HIGH);
+      digitalWrite(RED_LED, LOW);
     }
   }
   blynkconnectionstatus = Blynk.connected();
