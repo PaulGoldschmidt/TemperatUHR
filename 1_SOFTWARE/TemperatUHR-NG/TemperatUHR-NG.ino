@@ -170,7 +170,7 @@ void loop() {
     Serial.println("\nWorker process: Cloud");
     runsensor();
     Blynk.virtualWrite(V0, temperature);
-    calctime(); 
+    calctime();
     if (strlen(auth) > 30) {
       digitalWrite(GREEN_LED, LOW);
       Blynk.run();
@@ -182,17 +182,19 @@ void loop() {
       digitalWrite(GREEN_LED, LOW);
       delay(250);
       digitalWrite(GREEN_LED, HIGH);
-      digitalWrite(RED_LED, LOW);
+      digitalWrite(RED_LED, HIGH);
     }
   }
   blynkconnectionstatus = Blynk.connected();
   if (blynkconnectionstatus == true) {
     WiFi.softAPdisconnect(true);
+    digitalWrite(BLUE_LED, LOW); //error state 3: blynk not reachable (CODE BLUE)
   }
   else {
-      if (WiFi.softAP(softAP_ssid) == false) {
-        WiFi.softAP(softAP_ssid);
-      }
+    if (WiFi.softAP(softAP_ssid) == false) { //if hotspot is closed, turn it on!
+      WiFi.softAP(softAP_ssid);
+    }
   }
   delay(500);
+  if (blynkconnectionstatus == true) digitalWrite(BLUE_LED, HIGH); //turn off Blue LED
 }
