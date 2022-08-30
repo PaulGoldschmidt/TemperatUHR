@@ -188,13 +188,14 @@ void loop() {
   blynkconnectionstatus = Blynk.connected();
   if (blynkconnectionstatus == true) {
     WiFi.softAPdisconnect(true);
-    digitalWrite(BLUE_LED, LOW); //error state 3: blynk not reachable (CODE BLUE)
   }
   else {
     if (WiFi.softAP(softAP_ssid) == false) { //if hotspot is closed, turn it on!
       WiFi.softAP(softAP_ssid);
     }
+    digitalWrite(BLUE_LED, LOW); //error state 3: blynk not reachable (CODE BLUE)
+    delay(250);
+    digitalWrite(BLUE_LED, HIGH);
   }
   delay(500);
-  if (blynkconnectionstatus == true) digitalWrite(BLUE_LED, HIGH); //turn off Blue LED
 }
