@@ -21,8 +21,8 @@
 
 const char *softAP_ssid = "TemperatUHR";
 
-/* hostname for mDNS. Should work at least on windows. Try http://esp8266.local */
-const char *myHostname = "temperatUHR";
+/* hostname for mDNS. Should work at least on windows. Try http://temperatuhr.local/ */
+const char *myHostname = "temperatuhr";
 
 /* Don't set this wifi credentials. They are configurated at runtime and stored on EEPROM */
 char ssid[33] = "";

@@ -107,7 +107,7 @@ void handleRoot() {
             "</b></p><p>You may want to <a href='/wifi'>config the WLAN connection and add an Blynk Token</a>.</p>"
             "<footer>"
             "<p>TemperatUHR: A project by <a href=\"https://www.paul-goldschmidt.de/\">Paul Goldschmidt</a><br>");
-  Page += String(F("In cooperation with the <a href=\"https://www.paul-award.de/\">PAUL AWARD</a> / <a href=\"https://www.fed.de/\">FED e.V.</a> | Software Version: <a href=\"https://github.com/PaulGoldschmidt/TemperatUHR/releases/\">")) + String(SoftwareVer) + String(F("</a></p>"));
+  Page += String(F("In cooperation with the <a href=\"https://www.paul-award.de/\">PAUL AWARD</a> / <a href=\"https://www.fed.de/\">FED e.V.</a><br>Software Version: <a href=\"https://github.com/PaulGoldschmidt/TemperatUHR/releases/\">")) + String(SoftwareVer) + String(F("</a></p>"));
   Page += F(
             "</footer>"
             "</body></html>");
@@ -229,7 +229,7 @@ void handleWifi() {
             "<p>You may want to <a href='/'>return to the home page</a>.</p>"
             "<footer>"
             "<p>TemperatUHR: A project by <a href=\"https://www.paul-goldschmidt.de/\">Paul Goldschmidt</a><br>");
-  Page += String(F("In cooperation with the <a href=\"https://www.paul-award.de/\">PAUL AWARD</a> / <a href=\"https://www.fed.de/\">FED e.V.</a> | Software Version: <a href=\"https://github.com/PaulGoldschmidt/TemperatUHR/releases/\">")) + String(SoftwareVer) + String(F("</a></p>"));
+  Page += String(F("In cooperation with the <a href=\"https://www.paul-award.de/\">PAUL AWARD</a> / <a href=\"https://www.fed.de/\">FED e.V.</a><br>Software Version: <a href=\"https://github.com/PaulGoldschmidt/TemperatUHR/releases/\">")) + String(SoftwareVer) + String(F("</a></p>"));
   Page += F(
             "</footer>"
             "</body></html>");
