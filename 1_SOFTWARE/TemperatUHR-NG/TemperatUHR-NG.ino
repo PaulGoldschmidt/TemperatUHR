@@ -177,7 +177,7 @@ void loop() {
       delay(250);
       digitalWrite(GREEN_LED, HIGH);
     }
-    else { //error state 1: no blynk token provided
+    else { //error state 1: no blynk token provided (CODE AMBER)
       digitalWrite(RED_LED, LOW);
       digitalWrite(GREEN_LED, LOW);
       delay(250);

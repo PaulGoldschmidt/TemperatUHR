@@ -10,7 +10,7 @@ void runsensor() {
   temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
   Serial.print("Temperature: ");
   Serial.println(temperature);
-  while (temperature == -127) {
+  while (temperature == -127) { //error state 2: no temperature sensor connected (CODE RED)
     // Do work:
     Blynk.run();
     blynkconnectionstatus = Blynk.connected(); //check connection status for Webapp
