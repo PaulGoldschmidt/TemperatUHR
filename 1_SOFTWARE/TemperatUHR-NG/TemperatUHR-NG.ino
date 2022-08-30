@@ -77,9 +77,9 @@ int positioninarray = 0;
 bool blynkconnectionstatus = false;
 
 void setup() {
-  delay(100);
   Serial.begin(115200);
-  Serial.println("Hallo, world! TemperatUHR starting...");
+  delay(100);
+  Serial.println("Hello, world! TemperatUHR (Version \"" + String(SoftwareVer) + "\") starting...");
   pinMode(BUILTIN_LED0, OUTPUT); // Initialize the BUILTIN_LED1 pin as an output
   pinMode(RED_LED, OUTPUT); // Initialize the red pin as an output
   pinMode(GREEN_LED, OUTPUT); // Initialize the green pin as an output
