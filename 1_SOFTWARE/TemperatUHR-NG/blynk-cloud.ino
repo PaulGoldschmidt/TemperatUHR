@@ -16,13 +16,13 @@ void runsensor() {
     dnsServer.processNextRequest();
     //HTTP
     server.handleClient();
-    digitalWrite(GREEN_LED, HIGH); //turn off green and blue LEDs
+    digitalWrite(GREEN_LED, HIGH); //turn off all LEDs
     digitalWrite(BLUE_LED, HIGH);
+    digitalWrite(RED_LED, HIGH);
+    delay(250);
     sensors.requestTemperatures(); //request temp sensor data
     temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
-    digitalWrite(RED_LED, LOW);
-    delay(250);
-    digitalWrite(RED_LED, HIGH);
+    digitalWrite(RED_LED, LOW); // turn on red LED
     delay(250);
   }
   temperatuhrstandbycheck();
