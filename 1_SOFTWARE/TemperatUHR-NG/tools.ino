@@ -1,9 +1,9 @@
 /*
-   TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Version 2.0)
-   Software Version: 0.2-PRE
+   TEMPERATUHR NEXT GENERATION (TemperatUHR NG / Hardware Version 2.0+)
    Copyright Paul Goldschmidt, August 2022 - Heidelberg. https://paul-goldschmidt.de/
    Acknowledgements: https://github.com/PaulGoldschmidt/TemperatUHR/2_DOCUMENTATION/acknogledments.md
 */
+
 
 /** Is this an IP? */
 boolean isIp(String str) {
