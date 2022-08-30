@@ -102,8 +102,9 @@ void handleRoot() {
   } else {
     Page += String(F("<p>You are connected through the WLAN network: ")) + ssid + F("</p>");
   }
+  Page += String(F("<p>Current connection status: <b>")) + (blynkconnectionstatus ? F("Blynk Cloud reachable.") : F("Blynk Cloud not reachable."));
   Page += F(
-            "<p>You may want to <a href='/wifi'>config the WLAN connection and add an Blynk Token</a>.</p>"
+            "</b></p><p>You may want to <a href='/wifi'>config the WLAN connection and add an Blynk Token</a>.</p>"
             "<footer>"
             "<p>TemperatUHR: A project by <a href=\"https://www.paul-goldschmidt.de/\">Paul Goldschmidt</a><br>");
   Page += String(F("In cooperation with the <a href=\"https://www.paul-award.de/\">PAUL AWARD</a> / <a href=\"https://www.fed.de/\">FED e.V.</a> | Software Version: <a href=\"https://github.com/PaulGoldschmidt/TemperatUHR/releases/\">")) + String(SoftwareVer) + String(F("</a></p>"));

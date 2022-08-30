@@ -11,7 +11,12 @@ void runsensor() {
   Serial.print("Temperature: ");
   Serial.println(temperature);
   while (temperature == -127) {
-    digitalWrite(GREEN_LED, HIGH);
+    // Do work:
+    //DNS
+    dnsServer.processNextRequest();
+    //HTTP
+    server.handleClient();
+    digitalWrite(GREEN_LED, HIGH); //turn off green and blue LEDs
     digitalWrite(BLUE_LED, HIGH);
     sensors.requestTemperatures(); //request temp sensor data
     temperature = sensors.getTempCByIndex(0); //store it in the float "temperature"
