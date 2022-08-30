@@ -14,11 +14,13 @@ After installing, start the program and open the settings by clicking on "File" 
 Now, click "ok" and open the Board Manager by clicking on "Tools" -> "Board" -> "Board Manager". In the newly opened window type "esp2866" and install the package (at the time of writing Version 3.0.2 was the most recent one). After installing, close the window and check that the Arduino IDE is now able to communicate with the connected ESP-Microcontroller. For TemperatUHR, we use the ESP2866 in the package form of an "WEMOS D1 Mini", so select this microcontroller type in "Tools" -> "Board" -> "ESP2866" -> "LOLIN (WEMOS) D1 R2 & MINI". Now, open one of the build-in examples of the Arduino IDE and try to upload it to the connected board. If it doesn't work right away, be sure that the port on which the Microcontroller is connected checks out. You can do this by clicking on "Tools" -> "Port" and than take a look at what ports are offered in the section. Maybe you have to try out the different options till you find the correct port of the Microcontroller. If everything worked and no error message appared while compiling and flashing, you can move on to the next step
 ## Installing the required liberies
 TemperatUHR makes use of various liberies to simplify the whole development. Those liberies have to be installed manually. Here's an overview of the utilized liberies:
+
 | Nr. | Libery Name | What it does | Where to find it | Tested Version
 |--|--|--|--|--|
 | 1. | DallasTemperature | Sensor profile | Libary Manager | 3.9.0
 | 2. | OneWire | Communication protocol to sensor | Libary Manager | 2.3.5
 | 3. | Blynk | Communication handling | Libary Manager | 1.1.0
+
 For the record, the libary manager is located under "Sketch" -> "Include Libery" -> "Manage Libraries".
 With that, you can start writing the firmware onto the microcontroller.
 ## Flashing the firmware
