@@ -86,7 +86,6 @@ void setup() {
   digitalWrite(RED_LED, LOW); // Pull to LOW: Led ON
   digitalWrite(GREEN_LED, LOW); // Pull to LOW: Led ON
   digitalWrite(BLUE_LED, LOW); // Pull to LOW: Led ON
-  runsensor(); //get temp & check sensor
   initCaptive();
   digitalWrite(RED_LED, HIGH); // Pull to HIGH: Led OFF
   digitalWrite(GREEN_LED, HIGH); // Pull to HIGH: Led OFF
