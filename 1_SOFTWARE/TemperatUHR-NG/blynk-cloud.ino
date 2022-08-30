@@ -12,6 +12,8 @@ void runsensor() {
   Serial.println(temperature);
   while (temperature == -127) {
     // Do work:
+    Blynk.run();
+    blynkconnectionstatus = Blynk.connected(); //check connection status for Webapp
     //DNS
     dnsServer.processNextRequest();
     //HTTP
