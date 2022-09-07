@@ -24,10 +24,10 @@ Ziel der Struktur ist hier maximale Übersichtlichkeit bei minimaler Pfadtiefe. 
 
 ## Mithelfen und selber Handanlegen
 
-
+Ihr könnt bei dem Projekt selber aktiv werden und die Entwicklung zu einem noch flexiblerem Messgerät selber mitgestalten: Erstellt, bearbeitet und kommentiert [Issues](https://github.com/PaulGoldschmidt/TemperatUHR/issues), reicht selber [Änderungen in Soft- oder Hardware](https://github.com/PaulGoldschmidt/TemperatUHR/pulls) ein oder verfeinert die Dokumentation.
 
 ## Probleme und Support
 
-
+Probleme und Support zu dem Projekt werden ausschließlich über die [Issue-Funktion](https://github.com/PaulGoldschmidt/TemperatUHR/issues) von GitHub bereitgestellt. Da TemperatUHR in unserer Freizeit entsteht, können wir leider keinen schnellen Support garantieren. Wir versuchen aber unser bestes, jedem TemperatUHR zugänglich zu machen und Zeitnah auf Fragen zu antworten.
 
 ## Credits
