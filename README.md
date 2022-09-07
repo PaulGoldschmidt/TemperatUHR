@@ -7,6 +7,7 @@ Hier findest du alle Inhalte zum Nachbau, Weiterentwickeln und Durchstarten mit 
 
 Stelle dir vor, du hast eine richtig [alte Kochplatte](https://www.kuechen-atlas.de/kuechenplanung/kochfelder/massekochfeld/) und würdest gerne Nudeln kochen. Jetzt setzt du das Wasser auf den Herd und wartest, bis das Wasser kocht. Du wartest und wartest, und während du wartest, fragst du dich, ob du die Zeit nicht gerade besser nutzen könntest. Doch jeden Moment kocht bestimmt das Wasser!
 Genau dieses - und viele weitere Warte-Probleme gleich mit - löst TemperatUHR: Im Grunde ein beständiger Temperatur-Sensor, der dir Nachrichten über vorher konfigurierte Zustandsänderungen direkt auf dein Smartphone sendet.
+Ursprünglich wurde das Projekt für den [PAUL AWARD 2020](https://www.paul-award.de/) entwickelt, bei dem es den ersten Platz erreichen konnte. Seit dem wurde es grundlegend überarbeitet und noch einfacher im Nachbau gestaltet, dazu wurden modernere Technologien verwedendet und die komplette Dokumentation auch auf Deutsch verfasst.
 
 ## Nachbauen der TemperatUHR
 
