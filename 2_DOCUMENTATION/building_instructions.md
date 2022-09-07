@@ -1,2 +1,2 @@
-## Building TemperatUHR yourself: Instructions from start to finish
-(Currently WIP.)
+## Selber das "TemperatUHR"-Projekt bauen: Eine Anleitung
+(Aktuell im Aufbau)
