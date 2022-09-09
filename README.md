@@ -31,7 +31,7 @@ Ihr könnt bei dem Projekt selber aktiv werden und die Entwicklung zu einem noch
 
 Probleme und Support zu dem Projekt werden ausschließlich über die [Issue-Funktion](https://github.com/PaulGoldschmidt/TemperatUHR/issues) von GitHub bereitgestellt. Da TemperatUHR in unserer Freizeit entsteht, können wir leider keinen schnellen Support garantieren. Wir versuchen aber unser bestes, jedem TemperatUHR zugänglich zu machen und Zeitnah auf Fragen zu antworten.
 
-## Credits :tada
+## Credits :tada:
 TemperatUHR und seine Teile stehen unter der [GNU General Public License v3.0](https://github.com/PaulGoldschmidt/TemperatUHR/blob/main/LICENSE). Um die Lizenzen und weiteren Dankesagungen zu verwendeten Open-Source-Bibiliotheken zu sehen, werfe einen Blick in die [Acknowledgements](https://github.com/PaulGoldschmidt/TemperatUHR/blob/main/2_DOCUMENTATION/acknowledgements.md).
 
 Ein Projekt von [Paul Goldschmidt](https://paul-goldschmidt.de/), 2022. Entstanden in Kooperation mit dem [FED e.V.](https://www.fed.de/) sowie [weiteren Partnern](https://www.paul-award.de/sponsoren-partner/).
