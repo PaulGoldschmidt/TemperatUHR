@@ -2,7 +2,7 @@
 
 **For an english :uk: version of this README, [click here](https://github.com/PaulGoldschmidt/TemperatUHR/blob/main/README_EN.md).**
 
-Hier findest du alle Inhalte zum Nachbau, Weiterentwickeln und Durchstarten mit dem TemperatUHR-Projekt. Bitte beachte, dass dieses Repository ausschlißelich für das TemperatUHR-projekt in der zweiten Version (Codename: Next Generation, NG) gedacht ist. Für das veraltete und archivierte TemperatUHR Version 1-Repository klicke hier.
+Hier findest du alle Inhalte zum Nachbau, Weiterentwickeln und Durchstarten mit dem TemperatUHR-Projekt. Bitte beachte, dass dieses Repository ausschlißelich für das TemperatUHR-projekt in der zweiten Version (Codename: Next Generation, NG) gedacht ist. Für das veraltete und archivierte TemperatUHR Version 1-Repository [klicke hier](https://github.com/PaulGoldschmidt/TemperatUHRv1).
 
 ## Über das Projekt :mag_right:
 
